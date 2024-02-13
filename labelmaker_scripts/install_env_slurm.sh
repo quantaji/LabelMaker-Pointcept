@@ -7,13 +7,13 @@
 #SBATCH --cpus-per-task=6
 #SBATCH --mem-per-cpu=4G
 #SBATCH --tmp=32G
-#SBATCH --gpus=rtx_3090:1
 
 set -e
 
 module purge
 module load eth_proxy
 
+export PATH="/cluster/project/cvg/labelmaker/miniconda3/bin:${PATH}"
 
 env_name=labelmaker-pointcept
 conda create --name $env_name --yes python=3.9
