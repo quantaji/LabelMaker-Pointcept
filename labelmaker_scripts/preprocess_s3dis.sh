@@ -1,6 +1,6 @@
 #!/usr/bin/bash
-#SBATCH --job-name="labelmaker-pointcept-scannet-preprocess"
-#SBATCH --output=labelmaker_pointcept_scannet_preprocess.out
+#SBATCH --job-name="labelmaker-pointcept-s3dis-preprocess"
+#SBATCH --output=labelmaker_pointcept_s3dis_preprocess.out
 #SBATCH --time=12:00:00
 #SBATCH --ntasks=1
 #SBATCH -A ls_polle
