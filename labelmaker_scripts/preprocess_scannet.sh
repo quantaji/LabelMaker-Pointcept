@@ -19,8 +19,16 @@ env_name=labelmaker-pointcept
 eval "$(conda shell.bash hook)"
 conda activate $env_name
 
+which python
+which pip
+
 conda_home="$(conda info | grep "active env location : " | cut -d ":" -f2-)"
 conda_home="${conda_home#"${conda_home%%[![:space:]]*}"}"
+
+export CUDA_HOST_COMPILER="$conda_home/bin/gcc"
+export CUDA_PATH="$conda_home"
+export PATH="$conda_home/bin:$PATH"
+export CUDA_HOME=$CUDA_PATH
 
 RAW_SCANNET_DIR=/cluster/project/cvg/Shared_datasets/scannet
 PROCESSED_SCANNET_DIR=/cluster/project/cvg/labelmaker/ptv3_preprocessed_datasets/scannet
