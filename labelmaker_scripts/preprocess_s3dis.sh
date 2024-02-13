@@ -35,4 +35,5 @@ RAW_S3DIS_DIR=/cluster/project/cvg/labelmaker/S3DIS/Stanford2d3dDataset_noXYZ
 PROCESSED_S3DIS_DIR=/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/data/s3dis
 
 cd /cluster/project/cvg/labelmaker/LabelMaker-Pointcept
-python pointcept/datasets/preprocessing/s3dis/preprocess_s3dis.py --dataset_root ${S3DIS_DIR} --output_root ${PROCESSED_S3DIS_DIR} --raw_root ${RAW_S3DIS_DIR} --align_angle --parse_normal
+# python pointcept/datasets/preprocessing/s3dis/preprocess_s3dis.py --dataset_root ${S3DIS_DIR} --output_root ${PROCESSED_S3DIS_DIR} --raw_root ${RAW_S3DIS_DIR} --align_angle --parse_normal
+python pointcept/datasets/preprocessing/s3dis/preprocess_s3dis.py --dataset_root ${S3DIS_DIR} --output_root ${PROCESSED_S3DIS_DIR}
