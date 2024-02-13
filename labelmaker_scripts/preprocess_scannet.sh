@@ -31,7 +31,7 @@ export PATH="$conda_home/bin:$PATH"
 export CUDA_HOME=$CUDA_PATH
 
 RAW_SCANNET_DIR=/cluster/project/cvg/Shared_datasets/scannet
-PROCESSED_SCANNET_DIR=/cluster/project/cvg/labelmaker/ptv3_preprocessed_datasets/scannet
+PROCESSED_SCANNET_DIR=/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/data/scannet
 
 # RAW_SCANNET_DIR: the directory of downloaded ScanNet v2 raw dataset.
 # PROCESSED_SCANNET_DIR: the directory of the processed ScanNet dataset (output dir).
