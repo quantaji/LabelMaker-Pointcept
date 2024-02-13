@@ -32,38 +32,38 @@ export CUDA_HOME=$CUDA_PATH
 
 cd /cluster/project/cvg/labelmaker/S3DIS
 
-wget https://cvg-data.inf.ethz.ch/s3dis/Stanford3dDataset_v1.2.zip
+wget --no-verbose https://cvg-data.inf.ethz.ch/s3dis/Stanford3dDataset_v1.2.zip
 unzip -q Stanford3dDataset_v1.2.zip
 rm -rf Stanford3dDataset_v1.2.zip
 
 mkdir Stanford2d3dDataset_noXYZ
 cd Stanford2d3dDataset_noXYZ
 
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_1_no_xyz.tar
+wget --no-verbose https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_1_no_xyz.tar
 tar -xvf area_1_no_xyz.tar
 rm -rf area_1_no_xyz.tar
 
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_2_no_xyz.tar
+wget --no-verbose https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_2_no_xyz.tar
 tar -xvf area_2_no_xyz.tar
 rm -rf area_2_no_xyz.tar
 
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_3_no_xyz.tar
+wget --no-verbose https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_3_no_xyz.tar
 tar -xvf area_3_no_xyz.tar
 rm -rf area_3_no_xyz.tar
 
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_4_no_xyz.tar
+wget --no-verbose https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_4_no_xyz.tar
 tar -xvf area_4_no_xyz.tar
 rm -rf area_4_no_xyz.tar
 
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_5a_no_xyz.tar
+wget --no-verbose https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_5a_no_xyz.tar
 tar -xvf area_5a_no_xyz.tar
 rm -rf area_5a_no_xyz.tar
 
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_5b_no_xyz.tar
+wget --no-verbose https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_5b_no_xyz.tar
 tar -xvf area_5b_no_xyz.tar
 rm -rf area_5b_no_xyz.tar
 
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_6_no_xyz.tar
+wget --no-verbose https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_6_no_xyz.tar
 tar -xvf area_6_no_xyz.tar
 rm -rf area_6_no_xyz.tar
 
