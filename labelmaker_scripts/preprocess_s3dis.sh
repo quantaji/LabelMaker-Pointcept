@@ -30,38 +30,8 @@ export CUDA_PATH="$conda_home"
 export PATH="$conda_home/bin:$PATH"
 export CUDA_HOME=$CUDA_PATH
 
-echo $TMPDIR
-cd $TMPDIR
-
-wget https://cvg-data.inf.ethz.ch/s3dis/Stanford3dDataset_v1.2.zip
-unzip -q Stanford3dDataset_v1.2.zip
-
-mkdir Stanford2d3dDataset_noXYZ
-cd Stanford2d3dDataset_noXYZ
-
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_1_no_xyz.tar
-tar -xvf area_1_no_xyz.tar
-
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_2_no_xyz.tar
-tar -xvf area_2_no_xyz.tar
-
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_3_no_xyz.tar
-tar -xvf area_3_no_xyz.tar
-
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_4_no_xyz.tar
-tar -xvf area_4_no_xyz.tar
-
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_5a_no_xyz.tar
-tar -xvf area_5a_no_xyz.tar
-
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_5b_no_xyz.tar
-tar -xvf area_5b_no_xyz.tar
-
-wget https://cvg-data.inf.ethz.ch/2d3ds/no_xyz/area_6_no_xyz.tar
-tar -xvf area_6_no_xyz.tar
-
-S3DIS_DIR=$TMPDIR/Stanford3dDataset_v1.2
-RAW_S3DIS_DIR=$TMPDIR/Stanford2d3dDataset_noXYZ
+S3DIS_DIR=/cluster/project/cvg/labelmaker/S3DIS/Stanford3dDataset_v1.2
+RAW_S3DIS_DIR=/cluster/project/cvg/labelmaker/S3DIS/Stanford2d3dDataset_noXYZ
 PROCESSED_S3DIS_DIR=/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/data/s3dis
 
 cd /cluster/project/cvg/labelmaker/LabelMaker-Pointcept
