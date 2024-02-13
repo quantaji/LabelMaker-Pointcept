@@ -1,11 +1,13 @@
 #!/usr/bin/bash
 #SBATCH --job-name="labelmaker-pointcept-env-build"
 #SBATCH --output=labelmaker_pointcept_env_build.out
-#SBATCH --time=12:00:00
+#SBATCH --time=2:00:00
 #SBATCH --ntasks=1
+#SBATCH -A ls_polle
 #SBATCH --cpus-per-task=6
 #SBATCH --mem-per-cpu=4G
 #SBATCH --tmp=32G
+#SBATCH --gpus=rtx_3090:1
 
 set -e
 
