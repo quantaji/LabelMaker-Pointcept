@@ -13,6 +13,8 @@ set -e
 module purge
 module load eth_proxy
 
+export PATH="/cluster/project/cvg/labelmaker/miniconda3/bin:${PATH}"
+
 env_name=labelmaker-pointcept
 eval "$(conda shell.bash hook)"
 conda activate $env_name

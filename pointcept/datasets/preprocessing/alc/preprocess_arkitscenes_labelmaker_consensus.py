@@ -22,6 +22,8 @@ from labelmaker.label_data import get_wordnet
 from labelmaker.scannet_200_labels import VALID_CLASS_IDS_200
 from tqdm import tqdm
 
+IGNORE_INDEX = -1
+
 
 def get_wordnet_to_scannet200_mapping():
     table = pd.read_csv(Path(os.path.dirname(os.path.realpath(label_mappings.__file__))) / "mappings" / "label_mapping.csv")
@@ -45,6 +47,27 @@ def get_wordnet_to_scannet200_mapping():
     return mapping_array
 
 
+def get_wordnet_compact_mapping():
+    wordnet_info = get_wordnet()[1:]
+    wordnet_info = sorted(wordnet_info, key=lambda x: x["id"])
+
+    class2id = np.array([item["id"] for item in wordnet_info])
+    id2class = np.array([IGNORE_INDEX] * (class2id.max() + 1))
+    for class_, id_ in enumerate(class2id):
+        id2class[id_] = class_
+
+    return class2id, id2class
+
+
+def get_scannet200_compact_mapping():
+    class2id = np.array(VALID_CLASS_IDS_200)
+    id2class = np.array([IGNORE_INDEX] * (class2id.max() + 1))
+    for class_, id_ in enumerate(VALID_CLASS_IDS_200):
+        id2class[id_] = class_
+
+    return class2id, id2class
+
+
 def read_plypcd(filepath):
     """Read ply file and return it as numpy array. Returns None if emtpy."""
 
@@ -65,7 +88,13 @@ def read_plypcd(filepath):
         return coords, colors, normals
 
 
-def handle_process(scene_dir: str, output_path: str, label_mapping):
+def handle_process(
+    scene_dir: str,
+    output_path: str,
+    label_mapping,
+    wn199_id2class,
+    scannet200_id2class,
+):
     scene_dir = Path(scene_dir)
 
     print(f"Processing: {scene_dir.name} in {scene_dir.parent.name}")
@@ -81,8 +110,8 @@ def handle_process(scene_dir: str, output_path: str, label_mapping):
     label_file = scene_dir / "labels_downsampled.txt"
     wordnet_label = np.loadtxt(str(label_file), dtype=np.uint8).reshape(-1, 1)
     scannet200_label = label_mapping[wordnet_label]
-    save_dict["semantic_pseudo_gt_wn199"] = wordnet_label
-    save_dict["semantic_pseudo_gt_scannet200"] = scannet200_label
+    save_dict["semantic_pseudo_gt_wn199"] = wn199_id2class[wordnet_label]
+    save_dict["semantic_pseudo_gt_scannet200"] = scannet200_id2class[scannet200_label]
 
     torch.save(save_dict, output_path)
 
@@ -109,6 +138,8 @@ if __name__ == "__main__":
 
     # Load label map
     wn_scannet200_label_mapping = get_wordnet_to_scannet200_mapping()
+    _, wn199_id2class = get_wordnet_compact_mapping()
+    _, scannet200_id2class = get_scannet200_compact_mapping()
 
     scene_dirs = []
     output_paths = []
@@ -141,5 +172,7 @@ if __name__ == "__main__":
             scene_dirs,
             output_paths,
             repeat(wn_scannet200_label_mapping),
+            repeat(wn199_id2class),
+            repeat(scannet200_id2class),
         )
     )
