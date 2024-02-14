@@ -1,6 +1,6 @@
 #!/usr/bin/bash
-#SBATCH --job-name="labelmaker-pointcept-structure3d-download"
-#SBATCH --output=labelmaker_pointcept_structure3d_download.out
+#SBATCH --job-name="labelmaker-pointcept-structured3d-download"
+#SBATCH --output=labelmaker_pointcept_structured3d_download.out
 #SBATCH --time=12:00:00
 #SBATCH --ntasks=1
 #SBATCH -A ls_polle

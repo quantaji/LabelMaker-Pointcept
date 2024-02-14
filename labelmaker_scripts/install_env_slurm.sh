@@ -60,3 +60,6 @@ python setup.py install
 cd ../..
 
 pip install https://github.com/cvg/open3d-manylinux2014/releases/download/0.17.0/open3d_cpu-0.17.0-cp39-cp39-manylinux_2_17_x86_64.whl
+
+# install labelmaker
+pip install -U "git+https://github.com/cvg/LabelMaker.git"

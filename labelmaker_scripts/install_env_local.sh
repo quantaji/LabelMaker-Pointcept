@@ -45,3 +45,6 @@ python setup.py install
 cd ../..
 
 pip install open3d
+
+# install labelmaker
+pip install -U "git+https://github.com/cvg/LabelMaker.git"
