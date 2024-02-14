@@ -31,8 +31,8 @@ export CUDA_HOME=$CUDA_PATH
 # RAW_SCANNET_DIR=/media/hermann/data/labelmaker/ARKitScene_LabelMaker
 # PROCESSED_SCANNET_DIR=/home/guangda/repos/LabelMaker-Pointcept/data/alc
 
-RAW_SCANNET_DIR=/cluster/project/cvg/Shared_datasets/scannet
-PROCESSED_SCANNET_DIR=/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/data/scannet
+RAW_SCANNET_DIR=/cluster/project/cvg/labelmaker/ARKitScene_LabelMaker
+PROCESSED_SCANNET_DIR=/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/data/alc
 
 # RAW_SCANNET_DIR: the directory of downloaded ScanNet v2 raw dataset.
 # PROCESSED_SCANNET_DIR: the directory of the processed ScanNet dataset (output dir).
