@@ -67,6 +67,13 @@ def get_scannet200_compact_mapping():
 
     return class2id, id2class
 
+def get_wordnet_names():
+    wordnet_info = get_wordnet()[1:]
+    wordnet_info = sorted(wordnet_info, key=lambda x: x["id"])
+
+    names = [item['name'].split('.')[0].replace('_', ' ') for item in wordnet_info]
+
+    return names
 
 def read_plypcd(filepath):
     """Read ply file and return it as numpy array. Returns None if emtpy."""
