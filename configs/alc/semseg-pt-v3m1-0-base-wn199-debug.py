@@ -1,12 +1,9 @@
-from pointcept.datasets.preprocessing.scannet.meta_data.scannet200_constants import (
-    CLASS_LABELS_200,
-)
-
+from pointcept.datasets.preprocessing.alc.preprocess_arkitscenes_labelmaker_consensus import WORDNET_NAMES
 
 _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
-batch_size = 12  # bs: total bs in all gpus
+batch_size = 1  # bs: total bs in all gpus
 num_worker = 24
 mix_prob = 0.8
 empty_cache = False
@@ -15,7 +12,7 @@ enable_amp = True
 # model settings
 model = dict(
     type="DefaultSegmentorV2",
-    num_classes=200,
+    num_classes=185,
     backbone_out_channels=64,
     backbone=dict(
         type="PT-v3m1",
@@ -48,7 +45,7 @@ model = dict(
         pdnorm_decouple=True,
         pdnorm_adaptive=False,
         pdnorm_affine=True,
-        pdnorm_conditions=("ScanNet", "S3DIS", "Structured3D", "ALC"),
+        pdnorm_conditions=("ScanNet", "S3DIS", "Structured3D"),
     ),
     criteria=[
         dict(type="CrossEntropyLoss", loss_weight=1.0, ignore_index=-1),
@@ -58,10 +55,10 @@ model = dict(
 
 # scheduler settings
 epoch = 800
-optimizer = dict(type="AdamW", lr=0.00161, weight_decay=0.05)
+optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
 scheduler = dict(
     type="OneCycleLR",
-    max_lr=[0.00161, 0.000161],
+    max_lr=[0.006, 0.0006],
     pct_start=0.05,
     anneal_strategy="cos",
     div_factor=10.0,
@@ -70,13 +67,13 @@ scheduler = dict(
 param_dicts = [dict(keyword="block", lr=0.0006)]
 
 # dataset settings
-dataset_type = "ARKitScenesLabelMakerScanNet200Dataset"
+dataset_type = "ARKitScenesLabelMakerConsensusDataset"
 data_root = "data/alc"
 
 data = dict(
-    num_classes=200,
+    num_classes=185,
     ignore_index=-1,
-    names=CLASS_LABELS_200,
+    names=WORDNET_NAMES,
     train=dict(
         type=dataset_type,
         split="train",

@@ -91,7 +91,7 @@ class ARKitScenesLabelMakerConsensusDataset(Dataset):
         color = data["color"]
         normal = data["normal"]
         scene_id = data["scene_id"]
-        segment = data[self.label_key]
+        segment = data[self.label_key].reshape(-1)
         instance = np.ones(coord.shape[0]) * -1
 
         data_dict = dict(
