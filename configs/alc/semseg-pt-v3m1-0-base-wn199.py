@@ -1,4 +1,4 @@
-from pointcept.datasets.preprocessing.alc.preprocess_arkitscenes_labelmaker_consensus import get_wordnet_names
+from pointcept.datasets.preprocessing.alc.preprocess_arkitscenes_labelmaker_consensus import WORDNET_NAMES
 
 _base_ = ["../_base_/default_runtime.py"]
 
@@ -73,7 +73,7 @@ data_root = "data/alc"
 data = dict(
     num_classes=185,
     ignore_index=-1,
-    names=tuple(get_wordnet_names()),
+    names=WORDNET_NAMES,
     train=dict(
         type=dataset_type,
         split="train",

@@ -106,6 +106,7 @@ class PointPromptTraining(nn.Module):
         assert backbone.type in [
             "SpUNet-v1m3",
             "PT-v2m3",
+            "PT-v3m1",
         ]  # SpUNet v1m3: Sparse UNet with PDNorm
         self.backbone = MODELS.build(backbone)
         self.criteria = build_criteria(criteria)
@@ -141,7 +142,7 @@ class PointPromptTraining(nn.Module):
             )
         )
         data_dict["context"] = context
-        feat = self.backbone(data_dict)
+        feat = self.backbone(data_dict).feat
         if self.backbone_mode:
             # PPT serve as a multi-dataset backbone when enable backbone mode
             return feat
