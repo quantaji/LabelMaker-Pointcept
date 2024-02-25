@@ -1,12 +1,12 @@
 #!/usr/bin/bash
-#SBATCH --job-name="ptv3_arkit"
+#SBATCH --job-name="ptv3_ppt_scannet"
 #SBATCH --output=ptv3_ppt_arkit_scannet20_structured3d_s3dis_train_%j.out
-#SBATCH --time=1:00:00
+#SBATCH --time=24:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=8G
 #SBATCH -A ls_polle
-#SBATCH --gpus=rtx_4090:1
+#SBATCH --gpus=rtx_3090:8
 
 module purge
 module load gcc/11.4.0 cuda/12.1.1 eth_proxy
@@ -40,11 +40,11 @@ which python
 
 cd /cluster/project/cvg/labelmaker/LabelMaker-Pointcept
 
-# export CUDA_VISIBLE_DEVICES="0,1,2,3"
-export CUDA_VISIBLE_DEVICES="0"
+export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
+# export CUDA_VISIBLE_DEVICES="0"
 
 INTERPRETER_PATH=/cluster/project/cvg/labelmaker/miniconda3/envs/labelmaker-pointcept/bin/python
-NUM_GPU=1
+NUM_GPU=8
 DATASET_NAME=scannet
 CONFIG_NAME="semseg-pt-v3m1-1-ppt-extreme-alc"
 # CONFIG_NAME="semseg-pt-v3m1-0-base-wn199"

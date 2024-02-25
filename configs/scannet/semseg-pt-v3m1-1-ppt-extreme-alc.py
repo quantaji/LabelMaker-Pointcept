@@ -4,9 +4,9 @@ resume = False
 evaluate = True
 test_only = False
 seed = 44350923
-save_path = 'exp/scannet/semseg-pt-v3m1-1-ppt-extreme'
-num_worker = 2
-batch_size = 1
+save_path = "exp/scannet/semseg-pt-v3m1-1-ppt-extreme"
+num_worker = 48
+batch_size = 24
 batch_size_val = None
 batch_size_test = None
 epoch = 100
@@ -16,23 +16,16 @@ enable_amp = True
 empty_cache = False
 find_unused_parameters = True
 mix_prob = 0.8
-param_dicts = [dict(keyword='block', lr=0.0005)]
-hooks = [
-    dict(type='CheckpointLoader'),
-    dict(type='IterationTimer', warmup_iter=2),
-    dict(type='InformationWriter'),
-    dict(type='SemSegEvaluator'),
-    dict(type='CheckpointSaver', save_freq=None),
-    dict(type='PreciseEvaluator', test_last=False)
-]
-train = dict(type='MultiDatasetTrainer')
-test = dict(type='SemSegTester', verbose=True)
+param_dicts = [dict(keyword="block", lr=0.0005)]
+hooks = [dict(type="CheckpointLoader"), dict(type="IterationTimer", warmup_iter=2), dict(type="InformationWriter"), dict(type="SemSegEvaluator"), dict(type="CheckpointSaver", save_freq=None), dict(type="PreciseEvaluator", test_last=False)]
+train = dict(type="MultiDatasetTrainer")
+test = dict(type="SemSegTester", verbose=True)
 model = dict(
-    type='PPT-v1m1',
+    type="PPT-v1m1",
     backbone=dict(
-        type='PT-v3m1',
+        type="PT-v3m1",
         in_channels=6,
-        order=('z', 'z-trans', 'hilbert', 'hilbert-trans'),
+        order=("z", "z-trans", "hilbert", "hilbert-trans"),
         stride=(2, 2, 2, 2),
         enc_depths=(3, 3, 3, 6, 3),
         enc_channels=(48, 96, 192, 384, 512),
@@ -60,20 +53,14 @@ model = dict(
         pdnorm_decouple=True,
         pdnorm_adaptive=False,
         pdnorm_affine=True,
-        pdnorm_conditions=('ScanNet', 'S3DIS', 'Structured3D', 'ALC')),
-    criteria=[
-        dict(type='CrossEntropyLoss', loss_weight=1.0, ignore_index=-1),
-        dict(
-            type='LovaszLoss',
-            mode='multiclass',
-            loss_weight=1.0,
-            ignore_index=-1)
-    ],
+        pdnorm_conditions=("ScanNet", "S3DIS", "Structured3D", "ALC", "ScanNet200"),
+    ),
+    criteria=[dict(type="CrossEntropyLoss", loss_weight=1.0, ignore_index=-1), dict(type="LovaszLoss", mode="multiclass", loss_weight=1.0, ignore_index=-1)],
     backbone_out_channels=64,
     context_channels=256,
-    conditions=('Structured3D', 'ScanNet', 'S3DIS', 'ALC'),
-    template='[x]',
-    clip_model='ViT-B/16',
+    conditions=("Structured3D", "ScanNet", "S3DIS", "ALC", "ScanNet200"),
+    template="[x]",
+    clip_model="ViT-B/16",
     class_name=(
         "wall",
         "floor",
@@ -764,194 +751,105 @@ model = dict(
             293,
             294,
             295,
-        )
+        ),
     ),
-    backbone_mode=False)
-optimizer = dict(type='AdamW', lr=0.005, weight_decay=0.05)
-scheduler = dict(
-    type='OneCycleLR',
-    max_lr=[0.005, 0.0005],
-    pct_start=0.05,
-    anneal_strategy='cos',
-    div_factor=10.0,
-    final_div_factor=1000.0)
+    backbone_mode=False,
+)
+optimizer = dict(type="AdamW", lr=0.005, weight_decay=0.05)
+scheduler = dict(type="OneCycleLR", max_lr=[0.005, 0.0005], pct_start=0.05, anneal_strategy="cos", div_factor=10.0, final_div_factor=1000.0)
 data = dict(
     num_classes=20,
     ignore_index=-1,
-    names=[
-        'wall', 'floor', 'cabinet', 'bed', 'chair', 'sofa', 'table', 'door',
-        'window', 'bookshelf', 'picture', 'counter', 'desk', 'curtain',
-        'refridgerator', 'shower curtain', 'toilet', 'sink', 'bathtub',
-        'otherfurniture'
-    ],
+    names=["wall", "floor", "cabinet", "bed", "chair", "sofa", "table", "door", "window", "bookshelf", "picture", "counter", "desk", "curtain", "refridgerator", "shower curtain", "toilet", "sink", "bathtub", "otherfurniture"],
     train=dict(
-        type='ConcatDataset',
+        type="ConcatDataset",
         datasets=[
             dict(
-                type='Structured3DDataset',
-                split=['train', 'val', 'test'],
-                data_root='data/structured3d',
+                type="Structured3DDataset",
+                split=["train", "val", "test"],
+                data_root="data/structured3d",
                 transform=[
-                    dict(type='CenterShift', apply_z=True),
-                    dict(
-                        type='RandomDropout',
-                        dropout_ratio=0.2,
-                        dropout_application_ratio=0.2),
-                    dict(
-                        type='RandomRotate',
-                        angle=[-1, 1],
-                        axis='z',
-                        center=[0, 0, 0],
-                        p=0.5),
-                    dict(
-                        type='RandomRotate',
-                        angle=[-0.015625, 0.015625],
-                        axis='x',
-                        p=0.5),
-                    dict(
-                        type='RandomRotate',
-                        angle=[-0.015625, 0.015625],
-                        axis='y',
-                        p=0.5),
-                    dict(type='RandomScale', scale=[0.9, 1.1]),
-                    dict(type='RandomFlip', p=0.5),
-                    dict(type='RandomJitter', sigma=0.005, clip=0.02),
-                    dict(
-                        type='ElasticDistortion',
-                        distortion_params=[[0.2, 0.4], [0.8, 1.6]]),
-                    dict(
-                        type='ChromaticAutoContrast', p=0.2,
-                        blend_factor=None),
-                    dict(type='ChromaticTranslation', p=0.95, ratio=0.05),
-                    dict(type='ChromaticJitter', p=0.95, std=0.05),
-                    dict(
-                        type='GridSample',
-                        grid_size=0.02,
-                        hash_type='fnv',
-                        mode='train',
-                        return_grid_coord=True),
-                    dict(type='SphereCrop', sample_rate=0.8, mode='random'),
-                    dict(type='SphereCrop', point_max=102400, mode='random'),
-                    dict(type='CenterShift', apply_z=False),
-                    dict(type='NormalizeColor'),
-                    dict(type='Add', keys_dict=dict(condition='Structured3D')),
-                    dict(type='ToTensor'),
-                    dict(
-                        type='Collect',
-                        keys=('coord', 'grid_coord', 'segment', 'condition'),
-                        feat_keys=('color', 'normal'))
+                    dict(type="CenterShift", apply_z=True),
+                    dict(type="RandomDropout", dropout_ratio=0.2, dropout_application_ratio=0.2),
+                    dict(type="RandomRotate", angle=[-1, 1], axis="z", center=[0, 0, 0], p=0.5),
+                    dict(type="RandomRotate", angle=[-0.015625, 0.015625], axis="x", p=0.5),
+                    dict(type="RandomRotate", angle=[-0.015625, 0.015625], axis="y", p=0.5),
+                    dict(type="RandomScale", scale=[0.9, 1.1]),
+                    dict(type="RandomFlip", p=0.5),
+                    dict(type="RandomJitter", sigma=0.005, clip=0.02),
+                    dict(type="ElasticDistortion", distortion_params=[[0.2, 0.4], [0.8, 1.6]]),
+                    dict(type="ChromaticAutoContrast", p=0.2, blend_factor=None),
+                    dict(type="ChromaticTranslation", p=0.95, ratio=0.05),
+                    dict(type="ChromaticJitter", p=0.95, std=0.05),
+                    dict(type="GridSample", grid_size=0.02, hash_type="fnv", mode="train", return_grid_coord=True),
+                    dict(type="SphereCrop", sample_rate=0.8, mode="random"),
+                    dict(type="SphereCrop", point_max=102400, mode="random"),
+                    dict(type="CenterShift", apply_z=False),
+                    dict(type="NormalizeColor"),
+                    dict(type="Add", keys_dict=dict(condition="Structured3D")),
+                    dict(type="ToTensor"),
+                    dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
                 ],
                 test_mode=False,
-                loop=2),
+                loop=2,
+            ),
             dict(
-                type='ScanNetDataset',
-                split='train',
-                data_root='data/scannet',
+                type="ScanNetDataset",
+                split="train",
+                data_root="data/scannet",
                 transform=[
-                    dict(type='CenterShift', apply_z=True),
-                    dict(
-                        type='RandomDropout',
-                        dropout_ratio=0.2,
-                        dropout_application_ratio=0.2),
-                    dict(
-                        type='RandomRotate',
-                        angle=[-1, 1],
-                        axis='z',
-                        center=[0, 0, 0],
-                        p=0.5),
-                    dict(
-                        type='RandomRotate',
-                        angle=[-0.015625, 0.015625],
-                        axis='x',
-                        p=0.5),
-                    dict(
-                        type='RandomRotate',
-                        angle=[-0.015625, 0.015625],
-                        axis='y',
-                        p=0.5),
-                    dict(type='RandomScale', scale=[0.9, 1.1]),
-                    dict(type='RandomFlip', p=0.5),
-                    dict(type='RandomJitter', sigma=0.005, clip=0.02),
-                    dict(
-                        type='ElasticDistortion',
-                        distortion_params=[[0.2, 0.4], [0.8, 1.6]]),
-                    dict(
-                        type='ChromaticAutoContrast', p=0.2,
-                        blend_factor=None),
-                    dict(type='ChromaticTranslation', p=0.95, ratio=0.05),
-                    dict(type='ChromaticJitter', p=0.95, std=0.05),
-                    dict(
-                        type='GridSample',
-                        grid_size=0.02,
-                        hash_type='fnv',
-                        mode='train',
-                        return_grid_coord=True),
-                    dict(type='SphereCrop', point_max=102400, mode='random'),
-                    dict(type='CenterShift', apply_z=False),
-                    dict(type='NormalizeColor'),
-                    dict(type='ShufflePoint'),
-                    dict(type='Add', keys_dict=dict(condition='ScanNet')),
-                    dict(type='ToTensor'),
-                    dict(
-                        type='Collect',
-                        keys=('coord', 'grid_coord', 'segment', 'condition'),
-                        feat_keys=('color', 'normal'))
+                    dict(type="CenterShift", apply_z=True),
+                    dict(type="RandomDropout", dropout_ratio=0.2, dropout_application_ratio=0.2),
+                    dict(type="RandomRotate", angle=[-1, 1], axis="z", center=[0, 0, 0], p=0.5),
+                    dict(type="RandomRotate", angle=[-0.015625, 0.015625], axis="x", p=0.5),
+                    dict(type="RandomRotate", angle=[-0.015625, 0.015625], axis="y", p=0.5),
+                    dict(type="RandomScale", scale=[0.9, 1.1]),
+                    dict(type="RandomFlip", p=0.5),
+                    dict(type="RandomJitter", sigma=0.005, clip=0.02),
+                    dict(type="ElasticDistortion", distortion_params=[[0.2, 0.4], [0.8, 1.6]]),
+                    dict(type="ChromaticAutoContrast", p=0.2, blend_factor=None),
+                    dict(type="ChromaticTranslation", p=0.95, ratio=0.05),
+                    dict(type="ChromaticJitter", p=0.95, std=0.05),
+                    dict(type="GridSample", grid_size=0.02, hash_type="fnv", mode="train", return_grid_coord=True),
+                    dict(type="SphereCrop", point_max=102400, mode="random"),
+                    dict(type="CenterShift", apply_z=False),
+                    dict(type="NormalizeColor"),
+                    dict(type="ShufflePoint"),
+                    dict(type="Add", keys_dict=dict(condition="ScanNet")),
+                    dict(type="ToTensor"),
+                    dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
                 ],
                 test_mode=False,
-                loop=1),
+                loop=1,
+            ),
             dict(
-                type='S3DISDataset',
-                split=('Area_1', 'Area_2', 'Area_3', 'Area_4', 'Area_6'),
-                data_root='data/s3dis',
+                type="S3DISDataset",
+                split=("Area_1", "Area_2", "Area_3", "Area_4", "Area_6"),
+                data_root="data/s3dis",
                 transform=[
-                    dict(type='CenterShift', apply_z=True),
-                    dict(
-                        type='RandomDropout',
-                        dropout_ratio=0.2,
-                        dropout_application_ratio=0.2),
-                    dict(
-                        type='RandomRotate',
-                        angle=[-1, 1],
-                        axis='z',
-                        center=[0, 0, 0],
-                        p=0.5),
-                    dict(
-                        type='RandomRotate',
-                        angle=[-0.015625, 0.015625],
-                        axis='x',
-                        p=0.5),
-                    dict(
-                        type='RandomRotate',
-                        angle=[-0.015625, 0.015625],
-                        axis='y',
-                        p=0.5),
-                    dict(type='RandomScale', scale=[0.9, 1.1]),
-                    dict(type='RandomFlip', p=0.5),
-                    dict(type='RandomJitter', sigma=0.005, clip=0.02),
-                    dict(
-                        type='ChromaticAutoContrast', p=0.2,
-                        blend_factor=None),
-                    dict(type='ChromaticTranslation', p=0.95, ratio=0.05),
-                    dict(type='ChromaticJitter', p=0.95, std=0.05),
-                    dict(
-                        type='GridSample',
-                        grid_size=0.02,
-                        hash_type='fnv',
-                        mode='train',
-                        return_grid_coord=True),
-                    dict(type='SphereCrop', sample_rate=0.6, mode='random'),
-                    dict(type='SphereCrop', point_max=204800, mode='random'),
-                    dict(type='CenterShift', apply_z=False),
-                    dict(type='NormalizeColor'),
-                    dict(type='Add', keys_dict=dict(condition='S3DIS')),
-                    dict(type='ToTensor'),
-                    dict(
-                        type='Collect',
-                        keys=('coord', 'grid_coord', 'segment', 'condition'),
-                        feat_keys=('color', 'normal'))
+                    dict(type="CenterShift", apply_z=True),
+                    dict(type="RandomDropout", dropout_ratio=0.2, dropout_application_ratio=0.2),
+                    dict(type="RandomRotate", angle=[-1, 1], axis="z", center=[0, 0, 0], p=0.5),
+                    dict(type="RandomRotate", angle=[-0.015625, 0.015625], axis="x", p=0.5),
+                    dict(type="RandomRotate", angle=[-0.015625, 0.015625], axis="y", p=0.5),
+                    dict(type="RandomScale", scale=[0.9, 1.1]),
+                    dict(type="RandomFlip", p=0.5),
+                    dict(type="RandomJitter", sigma=0.005, clip=0.02),
+                    dict(type="ChromaticAutoContrast", p=0.2, blend_factor=None),
+                    dict(type="ChromaticTranslation", p=0.95, ratio=0.05),
+                    dict(type="ChromaticJitter", p=0.95, std=0.05),
+                    dict(type="GridSample", grid_size=0.02, hash_type="fnv", mode="train", return_grid_coord=True),
+                    dict(type="SphereCrop", sample_rate=0.6, mode="random"),
+                    dict(type="SphereCrop", point_max=204800, mode="random"),
+                    dict(type="CenterShift", apply_z=False),
+                    dict(type="NormalizeColor"),
+                    dict(type="Add", keys_dict=dict(condition="S3DIS")),
+                    dict(type="ToTensor"),
+                    dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
                 ],
                 test_mode=False,
-                loop=1),
+                loop=1,
+            ),
             dict(
                 type="ARKitScenesLabelMakerConsensusDataset",
                 split="train",
@@ -984,177 +882,59 @@ data = dict(
                     dict(type="CenterShift", apply_z=False),
                     dict(type="NormalizeColor"),
                     # dict(type="ShufflePoint"),
-                    dict(type='Add', keys_dict=dict(condition='ALC')),
+                    dict(type="Add", keys_dict=dict(condition="ALC")),
                     dict(type="ToTensor"),
                     dict(
                         type="Collect",
-                        keys=("coord", "grid_coord", "segment", 'condition'),
+                        keys=("coord", "grid_coord", "segment", "condition"),
                         feat_keys=("color", "normal"),
                     ),
                 ],
                 test_mode=False,
             ),
         ],
-        loop=1),
+        loop=1,
+    ),
     val=dict(
-        type='ScanNetDataset',
-        split='val',
-        data_root='data/scannet',
+        type="ScanNetDataset",
+        split="val",
+        data_root="data/scannet",
         transform=[
-            dict(type='CenterShift', apply_z=True),
-            dict(
-                type='GridSample',
-                grid_size=0.02,
-                hash_type='fnv',
-                mode='train',
-                return_grid_coord=True),
-            dict(type='CenterShift', apply_z=False),
-            dict(type='NormalizeColor'),
-            dict(type='ToTensor'),
-            dict(type='Add', keys_dict=dict(condition='ScanNet')),
-            dict(
-                type='Collect',
-                keys=('coord', 'grid_coord', 'segment', 'condition'),
-                feat_keys=('color', 'normal'))
+            dict(type="CenterShift", apply_z=True),
+            dict(type="GridSample", grid_size=0.02, hash_type="fnv", mode="train", return_grid_coord=True),
+            dict(type="CenterShift", apply_z=False),
+            dict(type="NormalizeColor"),
+            dict(type="ToTensor"),
+            dict(type="Add", keys_dict=dict(condition="ScanNet")),
+            dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
         ],
-        test_mode=False),
+        test_mode=False,
+    ),
     test=dict(
-        type='ScanNetDataset',
-        split='val',
-        data_root='data/scannet',
-        transform=[
-            dict(type='CenterShift', apply_z=True),
-            dict(type='NormalizeColor')
-        ],
+        type="ScanNetDataset",
+        split="val",
+        data_root="data/scannet",
+        transform=[dict(type="CenterShift", apply_z=True), dict(type="NormalizeColor")],
         test_mode=True,
         test_cfg=dict(
-            voxelize=dict(
-                type='GridSample',
-                grid_size=0.02,
-                hash_type='fnv',
-                mode='test',
-                keys=('coord', 'color', 'normal'),
-                return_grid_coord=True),
+            voxelize=dict(type="GridSample", grid_size=0.02, hash_type="fnv", mode="test", keys=("coord", "color", "normal"), return_grid_coord=True),
             crop=None,
-            post_transform=[
-                dict(type='CenterShift', apply_z=False),
-                dict(type='Add', keys_dict=dict(condition='ScanNet')),
-                dict(type='ToTensor'),
-                dict(
-                    type='Collect',
-                    keys=('coord', 'grid_coord', 'index', 'condition'),
-                    feat_keys=('color', 'normal'))
+            post_transform=[dict(type="CenterShift", apply_z=False), dict(type="Add", keys_dict=dict(condition="ScanNet")), dict(type="ToTensor"), dict(type="Collect", keys=("coord", "grid_coord", "index", "condition"), feat_keys=("color", "normal"))],
+            aug_transform=[
+                [{"type": "RandomRotateTargetAngle", "angle": [0], "axis": "z", "center": [0, 0, 0], "p": 1}],
+                [{"type": "RandomRotateTargetAngle", "angle": [0.5], "axis": "z", "center": [0, 0, 0], "p": 1}],
+                [{"type": "RandomRotateTargetAngle", "angle": [1], "axis": "z", "center": [0, 0, 0], "p": 1}],
+                [{"type": "RandomRotateTargetAngle", "angle": [1.5], "axis": "z", "center": [0, 0, 0], "p": 1}],
+                [{"type": "RandomRotateTargetAngle", "angle": [0], "axis": "z", "center": [0, 0, 0], "p": 1}, {"type": "RandomScale", "scale": [0.95, 0.95]}],
+                [{"type": "RandomRotateTargetAngle", "angle": [0.5], "axis": "z", "center": [0, 0, 0], "p": 1}, {"type": "RandomScale", "scale": [0.95, 0.95]}],
+                [{"type": "RandomRotateTargetAngle", "angle": [1], "axis": "z", "center": [0, 0, 0], "p": 1}, {"type": "RandomScale", "scale": [0.95, 0.95]}],
+                [{"type": "RandomRotateTargetAngle", "angle": [1.5], "axis": "z", "center": [0, 0, 0], "p": 1}, {"type": "RandomScale", "scale": [0.95, 0.95]}],
+                [{"type": "RandomRotateTargetAngle", "angle": [0], "axis": "z", "center": [0, 0, 0], "p": 1}, {"type": "RandomScale", "scale": [1.05, 1.05]}],
+                [{"type": "RandomRotateTargetAngle", "angle": [0.5], "axis": "z", "center": [0, 0, 0], "p": 1}, {"type": "RandomScale", "scale": [1.05, 1.05]}],
+                [{"type": "RandomRotateTargetAngle", "angle": [1], "axis": "z", "center": [0, 0, 0], "p": 1}, {"type": "RandomScale", "scale": [1.05, 1.05]}],
+                [{"type": "RandomRotateTargetAngle", "angle": [1.5], "axis": "z", "center": [0, 0, 0], "p": 1}, {"type": "RandomScale", "scale": [1.05, 1.05]}],
+                [{"type": "RandomFlip", "p": 1}],
             ],
-            aug_transform=[[{
-                'type': 'RandomRotateTargetAngle',
-                'angle': [0],
-                'axis': 'z',
-                'center': [0, 0, 0],
-                'p': 1
-            }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [0.5],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [1],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [1.5],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [0],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }, {
-                               'type': 'RandomScale',
-                               'scale': [0.95, 0.95]
-                           }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [0.5],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }, {
-                               'type': 'RandomScale',
-                               'scale': [0.95, 0.95]
-                           }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [1],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }, {
-                               'type': 'RandomScale',
-                               'scale': [0.95, 0.95]
-                           }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [1.5],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }, {
-                               'type': 'RandomScale',
-                               'scale': [0.95, 0.95]
-                           }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [0],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }, {
-                               'type': 'RandomScale',
-                               'scale': [1.05, 1.05]
-                           }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [0.5],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }, {
-                               'type': 'RandomScale',
-                               'scale': [1.05, 1.05]
-                           }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [1],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }, {
-                               'type': 'RandomScale',
-                               'scale': [1.05, 1.05]
-                           }],
-                           [{
-                               'type': 'RandomRotateTargetAngle',
-                               'angle': [1.5],
-                               'axis': 'z',
-                               'center': [0, 0, 0],
-                               'p': 1
-                           }, {
-                               'type': 'RandomScale',
-                               'scale': [1.05, 1.05]
-                           }], [{
-                               'type': 'RandomFlip',
-                               'p': 1
-                           }]])))
-
-
+        ),
+    ),
+)
