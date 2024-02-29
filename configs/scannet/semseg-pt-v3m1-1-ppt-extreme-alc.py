@@ -852,7 +852,7 @@ data = dict(
             ),
             dict(
                 type="ARKitScenesLabelMakerConsensusDataset",
-                split="train",
+                split=["train", "val"],
                 data_root="data/alc",
                 transform=[
                     dict(type="CenterShift", apply_z=True),

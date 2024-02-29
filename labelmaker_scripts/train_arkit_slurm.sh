@@ -48,7 +48,7 @@ NUM_GPU=4
 DATASET_NAME=alc
 CONFIG_NAME="semseg-pt-v3m1-0-base-scannet200"
 # CONFIG_NAME="semseg-pt-v3m1-0-base-wn199"
-EXP_NAME=arkitscenes_labelmaker_scannet200_pretrain
+EXP_NAME=arkitscenes_labelmaker_scannet200_pretrai_regular_lr
 # EXP_NAME=arkitscenes_labelmaker_wn199_pretrain
 
 sh scripts/train.sh \

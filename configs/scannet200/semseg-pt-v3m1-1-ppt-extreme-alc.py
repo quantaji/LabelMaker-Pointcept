@@ -6,11 +6,9 @@ resume = False
 evaluate = True
 test_only = False
 seed = 44350923
-save_path = "exp/scannet/semseg-pt-v3m1-1-ppt-extreme"
+save_path = "exp/scannet200/semseg-pt-v3m1-1-ppt-extreme"
 num_worker = 48
 batch_size = 24
-num_worker = 2
-batch_size = 1
 batch_size_val = None
 batch_size_test = None
 epoch = 100
@@ -856,7 +854,7 @@ data = dict(
             ),
             dict(
                 type="ARKitScenesLabelMakerConsensusDataset",
-                split="train",
+                split=["train", "val"],
                 data_root="data/alc",
                 transform=[
                     dict(type="CenterShift", apply_z=True),

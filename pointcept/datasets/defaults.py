@@ -33,33 +33,19 @@ class DefaultDataset(Dataset):
         self.data_root = data_root
         self.split = split
         self.transform = Compose(transform)
-        self.loop = (
-            loop if not test_mode else 1
-        )  # force make loop = 1 while in test mode
+        self.loop = loop if not test_mode else 1  # force make loop = 1 while in test mode
         self.test_mode = test_mode
         self.test_cfg = test_cfg if test_mode else None
 
         if test_mode:
-            self.test_voxelize = (
-                TRANSFORMS.build(self.test_cfg.voxelize)
-                if self.test_cfg.voxelize is not None
-                else None
-            )
-            self.test_crop = (
-                TRANSFORMS.build(self.test_cfg.crop)
-                if self.test_cfg.crop is not None
-                else None
-            )
+            self.test_voxelize = TRANSFORMS.build(self.test_cfg.voxelize) if self.test_cfg.voxelize is not None else None
+            self.test_crop = TRANSFORMS.build(self.test_cfg.crop) if self.test_cfg.crop is not None else None
             self.post_transform = Compose(self.test_cfg.post_transform)
             self.aug_transform = [Compose(aug) for aug in self.test_cfg.aug_transform]
 
         self.data_list = self.get_data_list()
         logger = get_root_logger()
-        logger.info(
-            "Totally {} x {} samples in {} set.".format(
-                len(self.data_list), self.loop, split
-            )
-        )
+        logger.info("Totally {} x {} samples in {} set.".format(len(self.data_list), self.loop, split))
 
     def get_data_list(self):
         if isinstance(self.split, str):
@@ -97,9 +83,7 @@ class DefaultDataset(Dataset):
         # load data
         data_dict = self.get_data(idx)
         data_dict = self.transform(data_dict)
-        result_dict = dict(
-            segment=data_dict.pop("segment"), name=self.get_data_name(idx)
-        )
+        result_dict = dict(segment=data_dict.pop("segment"), name=self.get_data_name(idx))
         if "origin_segment" in data_dict:
             assert "inverse" in data_dict
             result_dict["origin_segment"] = data_dict.pop("origin_segment")
@@ -146,20 +130,12 @@ class ConcatDataset(Dataset):
         self.loop = loop
         self.data_list = self.get_data_list()
         logger = get_root_logger()
-        logger.info(
-            "Totally {} x {} samples in the concat set.".format(
-                len(self.data_list), self.loop
-            )
-        )
+        logger.info("Totally {} x {} samples in the concat set.".format(len(self.data_list), self.loop))
 
     def get_data_list(self):
         data_list = []
         for i in range(len(self.datasets)):
-            data_list.extend(
-                zip(
-                    np.ones(len(self.datasets[i])) * i, np.arange(len(self.datasets[i]))
-                )
-            )
+            data_list.extend(zip(np.ones(len(self.datasets[i]), dtype=np.int64) * i, np.arange(len(self.datasets[i]))))
         return data_list
 
     def get_data(self, idx):
