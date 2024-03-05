@@ -33,3 +33,6 @@ nohup rsync -r -v -e "ssh -p 33798 -i ~/.ssh/id_rsa" /cluster/project/cvg/labelm
 # rsync -r -v -e "ssh -p 14516 -i ~/.ssh/id_rsa" root@94.101.98.117:/workspace/LabelMaker-Pointcept/exp/scannet200/scannet200_s3dis_structure3d_alc_joint_training/ /cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/scannet200/scannet200_s3dis_structure3d_alc_joint_training/
 
 rsync -r -v --checksum -e "ssh" guanji@euler.ethz.ch:/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/ /home/guangda/repos/LabelMaker-Pointcept/exp
+
+
+rsync -r -v -e "ssh -p 14516 -i ~/.ssh/id_rsa" root@94.101.98.117:/workspace/LabelMaker-Pointcept/exp/scannet/scannet_s3dis_structure3d_alc_joint_training/ /cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/scannet/scannet_s3dis_structure3d_alc_joint_training/

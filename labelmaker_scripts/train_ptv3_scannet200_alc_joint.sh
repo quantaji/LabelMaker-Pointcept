@@ -1,7 +1,7 @@
 #!/usr/bin/bash
-#SBATCH --job-name="ptv3_scannet_finetune"
-#SBATCH --output=ptv3_scannet_finetune_%j.out
-#SBATCH --time=4:00:00
+#SBATCH --job-name="ptv3_arkit_scannet200"
+#SBATCH --output=ptv3_arkit_scannet200_train_%j.out
+#SBATCH --time=120:00:00
 #SBATCH --ntasks=1
 #SBATCH --cpus-per-task=8
 #SBATCH --mem-per-cpu=8G
@@ -25,6 +25,19 @@ export CUDA_HOME=$CUDA_PATH
 
 which python
 
+# source_dir=/cluster/project/cvg/labelmaker/LabelMaker-Pointcept
+# target_dir=$TMPDIR/LabelMaker-Pointcept
+# echo "Start coping files!"
+# rsync -r \
+#     --exclude="data/s3dis" \
+#     --exclude="data/scannet" \
+#     --exclude="data/structured3d" \
+#     $source_dir/ \
+#     $target_dir
+# echo "Files copy finished!"
+
+# cd $target_dir
+
 cd /cluster/project/cvg/labelmaker/LabelMaker-Pointcept
 
 export CUDA_VISIBLE_DEVICES="0,1,2,3"
@@ -33,14 +46,13 @@ export CUDA_VISIBLE_DEVICES="0,1,2,3"
 INTERPRETER_PATH=/cluster/project/cvg/labelmaker/miniconda3/envs/labelmaker-pointcept/bin/python
 NUM_GPU=4
 DATASET_NAME=scannet200
-CONFIG_NAME="semseg-pt-v3m1-1-finetune"
-# CONFIG_NAME="semseg-pt-v3m1-0-base-wn199"
-EXP_NAME=ppt_pretrain_scannet200_finetune
-# EXP_NAME=arkitscenes_labelmaker_wn199_pretrain
+CONFIG_NAME="semseg-pt-v3m1-0-base-with-alc"
+EXP_NAME=alc_scannet200_joint
 
 sh scripts/train.sh \
     -p ${INTERPRETER_PATH} \
     -g ${NUM_GPU} \
     -d ${DATASET_NAME} \
     -c ${CONFIG_NAME} \
-    -n ${EXP_NAME} -r true
+    -n ${EXP_NAME} \
+    -r true
