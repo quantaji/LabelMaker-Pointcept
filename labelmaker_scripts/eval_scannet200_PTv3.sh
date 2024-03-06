@@ -33,13 +33,15 @@ export CUDA_VISIBLE_DEVICES="0"
 INTERPRETER_PATH=/home/guangda/miniconda3/envs/labelmaker-pointcept/bin/python
 NUM_GPU=1
 DATASET_NAME=scannet200
-CONFIG_NAME="semseg-pt-v3m1-0-base-test"
-EXP_NAME=alc_pretrain_scannet200_ft
+# CONFIG_NAME="semseg-pt-v3m1-0-base-test"
+# CONFIG_NAME="semseg-pt-v3m1-1-finetune"
+# EXP_NAME="alc_pretrain_scannet200_ft"
+EXP_NAME="ppt_pretrain_scannet200_finetune_linear"
+CKPT_PATH="model_best"
 
 sh scripts/test.sh \
     -p ${INTERPRETER_PATH} \
     -g ${NUM_GPU} \
     -d ${DATASET_NAME} \
-    -c ${CONFIG_NAME} \
     -n ${EXP_NAME} \
     -w ${CKPT_PATH}

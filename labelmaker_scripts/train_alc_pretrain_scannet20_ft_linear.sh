@@ -12,24 +12,23 @@ which python
 
 cd /home/guangda/repos/LabelMaker-Pointcept
 
-# export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
+# export CUDA_VISIBLE_DEVICES="0,1,2,3"
 export CUDA_VISIBLE_DEVICES="0"
 
 INTERPRETER_PATH=/home/guangda/miniconda3/envs/labelmaker-pointcept/bin/python
 NUM_GPU=1
-DATASET_NAME=scannet200
-# CONFIG_NAME="semseg-pt-v3m1-1-ppt-extreme-alc"
-# CONFIG_NAME="semseg-pt-v3m1-0-base-wn199"
-# EXP_NAME=scannet200_s3dis_structure3d_alc_joint_training
-# EXP_NAME=arkitscenes_labelmaker_wn199_pretrain
+DATASET_NAME=scannet
+# DATASET_NAME=scannet200
 CONFIG_NAME="semseg-pt-v3m1-0-base-ft"
-EXP_NAME=alc_pretrain_scannet200_ft_train_val
+# CONFIG_NAME="semseg-pt-v3m1-0-base-wn199"
+# CONFIG_NAME="semseg-pt-v3m1-1-finetune"
+EXP_NAME=alc_pretrain_scannet20_ft_linear
+# EXP_NAME=ppt_pretrain_scannet200_finetune_linear
+# EXP_NAME=arkitscenes_labelmaker_wn199_pretrain
 
-export OPENBLAS_NUM_THREADS=1
-
-sh scripts/test.sh \
+sh scripts/train.sh \
     -p ${INTERPRETER_PATH} \
     -g ${NUM_GPU} \
     -d ${DATASET_NAME} \
     -c ${CONFIG_NAME} \
-    -n ${EXP_NAME} 
+    -n ${EXP_NAME}
