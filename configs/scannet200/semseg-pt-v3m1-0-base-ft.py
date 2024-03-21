@@ -79,7 +79,8 @@ data = dict(
     names=CLASS_LABELS_200,
     train=dict(
         type=dataset_type,
-        split="train",
+        # split="train",
+        split=["train", "val"],
         data_root=data_root,
         transform=[
             dict(type="CenterShift", apply_z=True),

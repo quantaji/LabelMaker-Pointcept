@@ -1,7 +1,8 @@
 _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
-weight = "exp/alc/arkitscenes_labelmaker_scannet200_pretrai_regular_lr/model/model_modified.pth"
+# weight = "exp/alc/arkitscenes_labelmaker_scannet200_pretrai_regular_lr/model/model_modified.pth"
+weight = "exp/scannet/alc_pretrain_scannet20_ft_linear/model/model_best.pth"
 batch_size = 12  # bs: total bs in all gpus
 num_worker = 24
 mix_prob = 0.8
@@ -50,24 +51,34 @@ model = dict(
         dict(type="CrossEntropyLoss", loss_weight=1.0, ignore_index=-1),
         dict(type="LovaszLoss", mode="multiclass", loss_weight=1.0, ignore_index=-1),
     ],
-    freeze_backbone=True,
-    # freeze_backbone=False,
+    # freeze_backbone=True,
+    freeze_backbone=False,
 )
 
 # scheduler settings
 # epoch = 800
-epoch = 200
-eval_epoch = 200
-optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
+epoch = 400
+eval_epoch = 400
+# optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
+# scheduler = dict(
+#     type="OneCycleLR",
+#     max_lr=[0.006, 0.0006],
+#     pct_start=0.05,
+#     anneal_strategy="cos",
+#     div_factor=10.0,
+#     final_div_factor=1000.0,
+# )
+# param_dicts = [dict(keyword="block", lr=0.0006)]
+optimizer = dict(type="AdamW", lr=0.0006, weight_decay=0.05)
 scheduler = dict(
     type="OneCycleLR",
-    max_lr=[0.006, 0.0006],
+    max_lr=[0.0006, 0.00006],
     pct_start=0.05,
     anneal_strategy="cos",
     div_factor=10.0,
     final_div_factor=1000.0,
 )
-param_dicts = [dict(keyword="block", lr=0.0006)]
+param_dicts = [dict(keyword="block", lr=0.00006)]
 
 # dataset settings
 dataset_type = "ScanNetDataset"
