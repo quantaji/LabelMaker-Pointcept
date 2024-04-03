@@ -2,7 +2,8 @@ _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
 # weight = "exp/alc/arkitscenes_labelmaker_scannet200_pretrai_regular_lr/model/model_modified.pth"
-weight = "exp/scannet/alc_pretrain_scannet20_ft_linear/model/model_best.pth"
+weight = "exp/alc/arkitscenes_labelmaker_wn199_pretrain/model/model_modified_scannet20.pth"
+# weight = "exp/scannet/alc_pretrain_scannet20_ft_linear/model/model_best.pth"
 batch_size = 12  # bs: total bs in all gpus
 num_worker = 24
 mix_prob = 0.8
@@ -51,8 +52,8 @@ model = dict(
         dict(type="CrossEntropyLoss", loss_weight=1.0, ignore_index=-1),
         dict(type="LovaszLoss", mode="multiclass", loss_weight=1.0, ignore_index=-1),
     ],
-    # freeze_backbone=True,
-    freeze_backbone=False,
+    freeze_backbone=True,
+    # freeze_backbone=False,
 )
 
 # scheduler settings

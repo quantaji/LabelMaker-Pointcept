@@ -5,7 +5,8 @@ from pointcept.datasets.preprocessing.scannet.meta_data.scannet200_constants imp
 _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
-weight = "exp/alc/arkitscenes_labelmaker_scannet200_pretrain/model/model_best.pth"
+# weight = "exp/alc/arkitscenes_labelmaker_scannet200_pretrain/model/model_best.pth"
+weight = "exp/alc/arkitscenes_labelmaker_wn199_pretrain/model/model_modified_scannet200.pth"
 batch_size = 12  # bs: total bs in all gpus
 num_worker = 24
 mix_prob = 0.8
@@ -54,10 +55,23 @@ model = dict(
         dict(type="CrossEntropyLoss", loss_weight=1.0, ignore_index=-1),
         dict(type="LovaszLoss", mode="multiclass", loss_weight=1.0, ignore_index=-1),
     ],
+    freeze_backbone=True,
+    # freeze_backbone=False,
 )
 
 # scheduler settings
-epoch = 800
+epoch = 400
+eval_epoch = 400
+# optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
+# scheduler = dict(
+#     type="OneCycleLR",
+#     max_lr=[0.006, 0.0006],
+#     pct_start=0.05,
+#     anneal_strategy="cos",
+#     div_factor=10.0,
+#     final_div_factor=1000.0,
+# )
+# param_dicts = [dict(keyword="block", lr=0.0006)]
 optimizer = dict(type="AdamW", lr=0.0006, weight_decay=0.05)
 scheduler = dict(
     type="OneCycleLR",

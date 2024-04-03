@@ -17,12 +17,12 @@ export CUDA_VISIBLE_DEVICES="0"
 
 INTERPRETER_PATH=/home/guangda/miniconda3/envs/labelmaker-pointcept/bin/python
 NUM_GPU=1
-DATASET_NAME=scannet
-# DATASET_NAME=scannet200
+# DATASET_NAME=scannet
+DATASET_NAME=scannet200
 CONFIG_NAME="semseg-pt-v3m1-0-base-ft"
 # CONFIG_NAME="semseg-pt-v3m1-0-base-wn199"
 # CONFIG_NAME="semseg-pt-v3m1-1-finetune"
-EXP_NAME=alc_pretrain_scannet20_ft_linear
+EXP_NAME=alc_pretrain_scannet200_ft_linear_new
 # EXP_NAME=ppt_pretrain_scannet200_finetune_linear
 # EXP_NAME=arkitscenes_labelmaker_wn199_pretrain
 
