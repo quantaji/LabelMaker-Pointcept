@@ -87,8 +87,8 @@ scheduler = dict(
 param_dicts = [dict(keyword="block", lr=0.0006)]
 
 # dataset settings
-dataset_type = "ScanNetDataset"
-data_root = "data/scannet"
+dataset_type = "ScanNetPlusPlusDataset"
+data_root = "data/scannetpp"
 
 data = dict(
     num_classes=20,
