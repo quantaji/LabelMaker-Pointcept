@@ -2,6 +2,7 @@ from contextlib import nullcontext
 
 import torch
 import torch.nn as nn
+import torch_scatter
 
 from pointcept.models.losses import build_criteria
 from pointcept.models.utils.structure import Point
@@ -57,9 +58,14 @@ class DefaultSegmentorV2(nn.Module):
 
     def forward(self, input_dict):
         point = Point(input_dict)
-        with self.optional_freeze():
-            point = self.backbone(point)
-        seg_logits = self.seg_head(point.feat)
+        point = self.backbone(point)
+        # Backbone added after v1.5.0 return Point instead of feat and use DefaultSegmentorV2
+        # TODO: remove this part after make all backbone return Point only.
+        if isinstance(point, Point):
+            feat = point.feat
+        else:
+            feat = point
+        seg_logits = self.seg_head(feat)
         # train
         if self.training:
             loss = self.criteria(seg_logits, input_dict["segment"])
@@ -100,7 +106,20 @@ class DefaultClassifier(nn.Module):
         )
 
     def forward(self, input_dict):
-        feat = self.backbone(input_dict)
+        point = Point(input_dict)
+        point = self.backbone(point)
+        # Backbone added after v1.5.0 return Point instead of feat
+        # And after v1.5.0 feature aggregation for classification operated in classifier
+        # TODO: remove this part after make all backbone return Point only.
+        if isinstance(point, Point):
+            point.feat = torch_scatter.segment_csr(
+                src=point.feat,
+                indptr=nn.functional.pad(point.offset, (1, 0)),
+                reduce="mean",
+            )
+            feat = point.feat
+        else:
+            feat = point
         cls_logits = self.cls_head(feat)
         if self.training:
             loss = self.criteria(cls_logits, input_dict["category"])

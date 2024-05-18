@@ -16,7 +16,11 @@ try:
     import ocnn
     from ocnn.octree import Octree, Points
 except ImportError:
+    from pointcept.utils.misc import DummyClass
+
     ocnn = None
+    Octree = DummyClass
+    Points = DummyClass
 
 try:
     import dwconv
@@ -350,9 +354,9 @@ class OctFormerStage(torch.nn.Module):
                     qk_scale=qk_scale,
                     attn_drop=attn_drop,
                     proj_drop=proj_drop,
-                    drop_path=drop_path[i]
-                    if isinstance(drop_path, list)
-                    else drop_path,
+                    drop_path=(
+                        drop_path[i] if isinstance(drop_path, list) else drop_path
+                    ),
                     nempty=nempty,
                     activation=activation,
                 )

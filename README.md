@@ -15,8 +15,13 @@
 **Pointcept** is a powerful and flexible codebase for point cloud perception research. It is also an official implementation of the following paper:
 - **Point Transformer V3: Simpler, Faster, Stronger**  
 *Xiaoyang Wu, Li Jiang, Peng-Shuai Wang, Zhijian Liu, Xihui Liu, Yu Qiao, Wanli Ouyang, Tong He, Hengshuang Zhao*  
-arXiv Preprint 2023  
+IEEE Conference on Computer Vision and Pattern Recognition (**CVPR**) 2024 - Oral  
 [ Backbone ] [PTv3] - [ [arXiv](https://arxiv.org/abs/2312.10035) ] [ [Bib](https://xywu.me/research/ptv3/bib.txt) ] [ [Project](https://github.com/Pointcept/PointTransformerV3) ] &rarr; [here](https://github.com/Pointcept/PointTransformerV3)
+
+- **OA-CNNs: Omni-Adaptive Sparse CNNs for 3D Semantic Segmentation**  
+*Bohao Peng, Xiaoyang Wu, Li Jiang, Yukang Chen, Hengshuang Zhao, Zhuotao Tian, Jiaya Jia*  
+IEEE Conference on Computer Vision and Pattern Recognition (**CVPR**) 2024  
+[ Backbone ] [ OA-CNNs ] - [ [arXiv](https://arxiv.org/abs/2403.14418) ] [ [Bib](https://xywu.me/research/oacnns/bib.txt) ] &rarr; [here](#oa-cnns)
 
 - **PonderV2: Pave the Way for 3D Foundation Model with A Universal Pre-training Paradigm**  
 *Haoyi Zhu\*, Honghui Yang\*, Xiaoyang Wu\*, Di Huang\*, Sha Zhang, Xianglong He, Tong He, Hengshuang Zhao, Chunhua Shen, Yu Qiao, Wanli Ouyang*  
@@ -26,9 +31,8 @@ arXiv Preprint 2023
 
 - **Towards Large-scale 3D Representation Learning with Multi-dataset Point Prompt Training**  
 *Xiaoyang Wu, Zhuotao Tian, Xin Wen, Bohao Peng, Xihui Liu, Kaicheng Yu, Hengshuang Zhao*  
-arXiv Preprint 2023  
+IEEE Conference on Computer Vision and Pattern Recognition (**CVPR**) 2024  
 [ Pretrain ] [PPT] - [ [arXiv](https://arxiv.org/abs/2308.09718) ] [ [Bib](https://xywu.me/research/ppt/bib.txt) ] &rarr; [here](#point-prompt-training-ppt)
-
 
 - **Masked Scene Contrast: A Scalable Framework for Unsupervised 3D Representation Learning**  
 *Xiaoyang Wu, Xin Wen, Xihui Liu, Hengshuang Zhao*  
@@ -58,6 +62,7 @@ Backbone:
 [MinkUNet](https://github.com/NVIDIA/MinkowskiEngine) ([here](#sparseunet)),
 [SpUNet](https://github.com/traveller59/spconv) ([here](#sparseunet)),
 [SPVCNN](https://github.com/mit-han-lab/spvnas) ([here](#spvcnn)),
+[OACNNs](https://arxiv.org/abs/2403.14418) ([here](#oa-cnns)),
 [PTv1](https://arxiv.org/abs/2012.09164) ([here](#point-transformers)),
 [PTv2](https://arxiv.org/abs/2210.05666) ([here](#point-transformers)),
 [PTv3](https://arxiv.org/abs/2312.10035) ([here](#point-transformers)),
@@ -77,6 +82,7 @@ Pre-training:
 Datasets:
 [ScanNet](http://www.scan-net.org/) ([here](#scannet-v2)), 
 [ScanNet200](http://www.scan-net.org/) ([here](#scannet-v2)),
+[ScanNet++](https://kaldir.vc.in.tum.de/scannetpp/) ([here](#scannet)),
 [S3DIS](https://docs.google.com/forms/d/e/1FAIpQLScDimvNMCGhy_rmBA2gHfDu3naktRm6A8BPwAWWDv-Uhm6Shw/viewform?c=0&w=1) ([here](#s3dis)),
 [ArkitScene](https://github.com/apple/ARKitScenes),
 [Structured3D](https://structured3d-dataset.org/) ([here](#structured3d)),
@@ -87,6 +93,10 @@ Datasets:
 
 
 ## Highlights
+- *May, 2024*: In v1.5.2, we redesigned the default structure for each dataset for better performance. Please **re-preprocess** datasets or **download** our preprocessed datasets from **[here](https://huggingface.co/Pointcept)**.
+- *Apr, 2024*: **PTv3** is selected as one of the 90 **Oral** papers (3.3% accepted papers, 0.78% submissions) by CVPR'24!
+- *Mar, 2024*: We release code for **OA-CNNs**, accepted by CVPR'24. Issue related to **OA-CNNs** can @Pbihao.
+- *Feb, 2024*: **PTv3** and **PPT** are accepted by CVPR'24, another **two** papers by our Pointcept team have also been accepted by CVPR'24 🎉🎉🎉. We will make them publicly available soon!
 - *Dec, 2023*: **PTv3** is released on arXiv, and the code is available in Pointcept. PTv3 is an efficient backbone model that achieves SOTA performances across indoor and outdoor scenarios.
 - *Aug, 2023*: **PPT** is released on arXiv. PPT presents a multi-dataset pre-training framework that achieves SOTA performance in both **indoor** and **outdoor** scenarios. It is compatible with various existing pre-training frameworks and backbones.  A **pre-release** version of the code is accessible; for those interested, please feel free to contact me directly for access.
 - *Mar, 2023*: We released our codebase, **Pointcept**, a highly potent tool for point cloud representation learning and perception. We welcome new work to join the _Pointcept_ family and highly recommend reading [Quick Start](#quick-start) before starting your trail.
@@ -157,7 +167,6 @@ pip install open3d
 ### ScanNet v2
 
 The preprocessing supports semantic and instance segmentation for both `ScanNet20`, `ScanNet200`, and `ScanNet Data Efficient`.
-
 - Download the [ScanNet](http://www.scan-net.org/) v2 dataset.
 - Run preprocessing code for raw ScanNet as follows:
 
@@ -166,9 +175,6 @@ The preprocessing supports semantic and instance segmentation for both `ScanNet2
 # PROCESSED_SCANNET_DIR: the directory of the processed ScanNet dataset (output dir).
 python pointcept/datasets/preprocessing/scannet/preprocess_scannet.py --dataset_root ${RAW_SCANNET_DIR} --output_root ${PROCESSED_SCANNET_DIR}
 ```
-
-- (Alternative) Our preprocess data can also be downloaded [[here](https://connecthkuhk-my.sharepoint.com/:u:/g/personal/wuxy_connect_hku_hk/EREuB1If2DNEjz43-rdaVf4B5toMaIViXv8gEbxr9ydeYA?e=ffXeG4)], please agree the official license before download it.
-
 - (Optional) Download ScanNet Data Efficient files:
 ```bash
 # download-scannet.py is the official download script
@@ -177,11 +183,13 @@ python download-scannet.py --data_efficient -o ${RAW_SCANNET_DIR}
 # unzip downloads
 cd ${RAW_SCANNET_DIR}/tasks
 unzip limited-annotation-points.zip
-unzip limited-bboxes.zip
 unzip limited-reconstruction-scenes.zip
 # copy files to processed dataset folder
-cp -r ${RAW_SCANNET_DIR}/tasks ${PROCESSED_SCANNET_DIR}
+mkdir ${PROCESSED_SCANNET_DIR}/tasks
+cp -r ${RAW_SCANNET_DIR}/tasks/points ${PROCESSED_SCANNET_DIR}/tasks
+cp -r ${RAW_SCANNET_DIR}/tasks/scenes ${PROCESSED_SCANNET_DIR}/tasks
 ```
+- (Alternative) Our preprocess data can be directly downloaded [[here](https://huggingface.co/datasets/Pointcept/scannet-compressed)], please agree the official license before download it.
 
 - Link processed dataset to codebase:
 ```bash
@@ -190,9 +198,35 @@ mkdir data
 ln -s ${PROCESSED_SCANNET_DIR} ${CODEBASE_DIR}/data/scannet
 ```
 
+### ScanNet++
+- Download the [ScanNet++](https://kaldir.vc.in.tum.de/scannetpp/) dataset.
+- Run preprocessing code for raw ScanNet++ as follows:
+```bash
+# RAW_SCANNETPP_DIR: the directory of downloaded ScanNet++ raw dataset.
+# PROCESSED_SCANNETPP_DIR: the directory of the processed ScanNet++ dataset (output dir).
+# NUM_WORKERS: the number of workers for parallel preprocessing.
+python pointcept/datasets/preprocessing/scannetpp/preprocess_scannetpp.py --dataset_root ${RAW_SCANNETPP_DIR} --output_root ${PROCESSED_SCANNETPP_DIR} --num_workers ${NUM_WORKERS}
+```
+- Sampling and chunking large point cloud data in train/val split as follows (only used for training):
+```bash
+# PROCESSED_SCANNETPP_DIR: the directory of the processed ScanNet++ dataset (output dir).
+# NUM_WORKERS: the number of workers for parallel preprocessing.
+python pointcept/datasets/preprocessing/sampling_chunking_data.py --dataset_root ${PROCESSED_SCANNETPP_DIR} --grid_size 0.01 --chunk_range 6 6 --chunk_stride 3 3 --split train --num_workers ${NUM_WORKERS}
+python pointcept/datasets/preprocessing/sampling_chunking_data.py --dataset_root ${PROCESSED_SCANNETPP_DIR} --grid_size 0.01 --chunk_range 6 6 --chunk_stride 3 3 --split val --num_workers ${NUM_WORKERS}
+```
+- (Alternative) Our preprocess data can be directly downloaded [[here](https://huggingface.co/datasets/Pointcept/scannetpp-compressed)], please agree the official license before download it.
+- Link processed dataset to codebase:
+```bash
+# PROCESSED_SCANNETPP_DIR: the directory of the processed ScanNet dataset.
+mkdir data
+ln -s ${PROCESSED_SCANNETPP_DIR} ${CODEBASE_DIR}/data/scannetpp
+```
+
 ### S3DIS
 
 - Download S3DIS data by filling this [Google form](https://docs.google.com/forms/d/e/1FAIpQLScDimvNMCGhy_rmBA2gHfDu3naktRm6A8BPwAWWDv-Uhm6Shw/viewform?c=0&w=1). Download the `Stanford3dDataset_v1.2.zip` file and unzip it.
+- Fix error in `Area_5/office_19/Annotations/ceiling` Line 323474 (103.0�0000 => 103.000000).
+- (Optional) Download Full 2D-3D S3DIS dataset (no XYZ) from [here](https://github.com/alexsax/2D-3D-Semantics) for parsing normal.
 - Run preprocessing code for S3DIS as follows:
 
 ```bash
@@ -209,7 +243,7 @@ python pointcept/datasets/preprocessing/s3dis/preprocess_s3dis.py --dataset_root
 python pointcept/datasets/preprocessing/s3dis/preprocess_s3dis.py --dataset_root ${S3DIS_DIR} --output_root ${PROCESSED_S3DIS_DIR} --raw_root ${RAW_S3DIS_DIR} --align_angle --parse_normal
 ```
 
-- (Alternative) Our preprocess data can also be downloaded [[here](https://connecthkuhk-my.sharepoint.com/:u:/g/personal/wuxy_connect_hku_hk/ERtd0QAyLGNMs6vsM4XnebcBseQ8YTL0UTrMmp11PmQF3g?e=MsER95
+- (Alternative) Our preprocess data can also be downloaded [[here](https://huggingface.co/datasets/Pointcept/s3dis-compressed
 )] (with normal vector and aligned angle), please agree with the official license before downloading it.
 
 - Link processed dataset to codebase.
@@ -234,7 +268,7 @@ Following the instruction of [Swin3D](https://arxiv.org/abs/2304.06906), we keep
 
 [//]: # (- &#40;Alternative&#41; Our preprocess data can also be downloaded [[here]&#40;&#41;], please agree the official license before download it.)
 
-- (Alternative) Our preprocess data can also be downloaded [[here](https://connecthkuhk-my.sharepoint.com/:u:/g/personal/wuxy_connect_hku_hk/EaTAxo4SvEJFnDVuv9bOol4B0GCI806BeI4G-TF9Rp7lZw?e=drU9FN
+- (Alternative) Our preprocess data can also be downloaded [[here](https://huggingface.co/datasets/Pointcept/structured3d-compressed
 )] (with perspective views and panorama view, 471.7G after unzipping), please agree the official license before download it.
 
 - Link processed dataset to codebase.
@@ -280,7 +314,7 @@ pip install nuscenes-devkit pyquaternion
 python pointcept/datasets/preprocessing/nuscenes/preprocess_nuscenes_info.py --dataset_root ${NUSCENES_DIR} --output_root ${PROCESSED_NUSCENES_DIR} --max_sweeps ${MAX_SWEEPS} --with_camera
 ```
 - (Alternative) Our preprocess nuScenes information data can also be downloaded [[here](
-)], please agree the official license before download it.
+https://huggingface.co/datasets/Pointcept/nuscenes-compressed)] (only processed information, still need to download raw dataset and link to the folder), please agree the official license before download it.
 
 - Link raw dataset to processed NuScene dataset folder:
 ```bash
@@ -309,7 +343,7 @@ ln -s ${PROCESSED_NUSCENES_DIR} ${CODEBASE_DIR}/data/nuscenes
 ```
 
 ### Waymo
-- Download the official [Waymo](https://waymo.com/open/download/) dataset (v1.3.2 ~ v1.4.2) and organize the downloaded files as follows:
+- Download the official [Waymo](https://waymo.com/open/download/) dataset (v1.4.3) and organize the downloaded files as follows:
 ```bash
 WAYMO_RAW_DIR
 │── training
@@ -319,9 +353,11 @@ WAYMO_RAW_DIR
 - Install the following dependence:
 ```bash
 # If shows "No matching distribution found", download whl directly from Pypi and install the package.
-pip install waymo-open-dataset-tf-2-11-0
+conda create -n waymo python=3.10 -y
+conda activate waymo
+pip install waymo-open-dataset-tf-2-12-0
 ```
-- Run information preprocessing code as follows, the preprocessing code turns the raw Waymo dataset to a SemanticKITTI style:
+- Run the preprocessing code as follows:
 ```bash
 # WAYMO_DIR: the directory of the downloaded Waymo dataset.
 # PROCESSED_WAYMO_DIR: the directory of the processed Waymo dataset (output dir).
@@ -491,23 +527,84 @@ sh scripts/train.sh -g 4 -d s3dis -c semseg-minkunet34c-0-base -n semseg-minkune
 sh scripts/train.sh -g 2 -d semantic_kitti -c semseg-minkunet34c-0-base -n semseg-minkunet34c-0-base
 ```
 
+#### OA-CNNs
+Introducing Omni-Adaptive 3D CNNs (**OA-CNNs**), a family of networks that integrates a lightweight module to greatly enhance the adaptivity of sparse CNNs at minimal computational cost. Without any self-attention modules, **OA-CNNs** favorably surpass point transformers in terms of accuracy in both indoor and outdoor scenes, with much less latency and memory cost. Issue related to **OA-CNNs** can @Pbihao.
+```bash
+# ScanNet
+sh scripts/train.sh -g 4 -d scannet -c semseg-oacnns-v1m1-0-base -n semseg-oacnns-v1m1-0-base
+```
+
 #### Point Transformers
 - **PTv3**
 
 [PTv3](https://arxiv.org/abs/2312.10035) is an efficient backbone model that achieves SOTA performances across indoor and outdoor scenarios. The full PTv3 relies on FlashAttention, while FlashAttention relies on CUDA 11.6 and above, make sure your local Pointcept environment satisfies the requirements.
 
-If you can not upgrade your local environment to satisfy the requirements (CUDA >= 11.6), then you can disable FlashAttention by setting the model parameter `enable_flash` to `false` and reducing the `enc_patch_size` and `dec_patch_size` to a level.
+If you can not upgrade your local environment to satisfy the requirements (CUDA >= 11.6), then you can disable FlashAttention by setting the model parameter `enable_flash` to `false` and reducing the `enc_patch_size` and `dec_patch_size` to a level (e.g. 128).
 
 FlashAttention force disables RPE and forces the accuracy reduced to fp16. If you require these features, please disable `enable_flash` and adjust `enable_rpe`, `upcast_attention` and`upcast_softmax`.
 
 Detailed instructions and experiment records (containing weights) are available on the [project repository](https://github.com/Pointcept/PointTransformerV3). Example running scripts are as follows:
 ```bash
-# Scratched Settings
+# Scratched ScanNet
 sh scripts/train.sh -g 4 -d scannet -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
-sh scripts/train.sh -g 4 -d scannet200 -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+# PPT joint training (ScanNet + Structured3D) and evaluate in ScanNet
+sh scripts/train.sh -g 8 -d scannet -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v3m1-1-ppt-extreme
 
-# More configs and exp records for PTv3 will be available soon. (Before Feb 2024) 
+# Scratched ScanNet200
+sh scripts/train.sh -g 4 -d scannet200 -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+# Fine-tuning from  PPT joint training (ScanNet + Structured3D) with ScanNet200
+# PTV3_PPT_WEIGHT_PATH: Path to model weight trained by PPT multi-dataset joint training
+# e.g. exp/scannet/semseg-pt-v3m1-1-ppt-extreme/model/model_best.pth
+sh scripts/train.sh -g 4 -d scannet200 -c semseg-pt-v3m1-1-ppt-ft -n semseg-pt-v3m1-1-ppt-ft -w ${PTV3_PPT_WEIGHT_PATH}
+
+# Scratched ScanNet++
+sh scripts/train.sh -g 4 -d scannetpp -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+# Scratched ScanNet++ test
+sh scripts/train.sh -g 4 -d scannetpp -c semseg-pt-v3m1-1-submit -n semseg-pt-v3m1-1-submit
+
+
+# Scratched S3DIS
+sh scripts/train.sh -g 4 -d s3dis -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+# an example for disbale flash_attention and enable rpe.
+sh scripts/train.sh -g 4 -d s3dis -c semseg-pt-v3m1-1-rpe -n semseg-pt-v3m1-0-rpe
+# PPT joint training (ScanNet + S3DIS + Structured3D) and evaluate in ScanNet
+sh scripts/train.sh -g 8 -d s3dis -c semseg-pt-v3m1-1-ppt-extreme -n semseg-pt-v3m1-1-ppt-extreme
+# S3DIS 6-fold cross validation
+# 1. The default configs are evaluated on Area_5, modify the "data.train.split", "data.val.split", and "data.test.split" to make the config evaluated on Area_1 ~ Area_6 respectively.
+# 2. Train and evaluate the model on each split of areas and gather result files located in "exp/s3dis/EXP_NAME/result/Area_x.pth" in one single folder, noted as RECORD_FOLDER.
+# 3. Run the following script to get S3DIS 6-fold cross validation performance:
+export PYTHONPATH=./
+python tools/test_s3dis_6fold.py --record_root ${RECORD_FOLDER}
+
+# Scratched nuScenes
+sh scripts/train.sh -g 4 -d nuscenes -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+# Scratched Waymo
+sh scripts/train.sh -g 4 -d waymo -c semseg-pt-v3m1-0-base -n semseg-pt-v3m1-0-base
+
+# More configs and exp records for PTv3 will be available soon.
 ```
+
+Indoor semantic segmentation  
+| Model | Benchmark | Additional Data | Num GPUs | Val mIoU | Config | Tensorboard | Exp Record |
+| :---: | :---: |:---------------:| :---: | :---: | :---: | :---: | :---: |
+| PTv3 | ScanNet |     &cross;     | 4 | 77.6% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet-semseg-pt-v3m1-0-base) |
+| PTv3 + PPT | ScanNet |     &check;     | 8 | 78.5% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet/semseg-pt-v3m1-1-ppt-extreme.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet-semseg-pt-v3m1-1-ppt-extreme) |
+| PTv3 | ScanNet200 |     &cross;     | 4 | 35.3% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/scannet200/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) |[link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/scannet200-semseg-pt-v3m1-0-base)|
+| PTv3 + PPT | ScanNet200 | &check; (f.t.)  | 4 |  |  |  |  |
+| PTv3 | S3DIS (Area5) |     &cross;     | 4 | 73.6% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/s3dis/semseg-pt-v3m1-0-rpe.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/s3dis-semseg-pt-v3m1-0-rpe) |
+| PTv3 + PPT | S3DIS (Area5) |     &check;     | 8 | 75.4% | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/s3dis/semseg-pt-v3m1-1-ppt-extreme.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/s3dis-semseg-pt-v3m1-1-ppt-extreme) |
+
+Outdoor semantic segmentation  
+| Model | Benchmark | Additional Data | Num GPUs | Val mIoU | Config | Tensorboard | Exp Record |
+| :---: | :---: | :---: | :---: | :---: | :---: | :---: | :---: |
+| PTv3 | nuScenes | &cross; | 4 | 80.3 | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/nuscenes/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard)|[link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/nuscenes-semseg-pt-v3m1-0-base) |
+| PTv3 + PPT | nuScenes | &check; | 8 | | | | |
+| PTv3 | SemanticKITTI | &cross; | 4 | | | | |
+| PTv3 + PPT | SemanticKITTI | &check; | 8 | | | | |
+| PTv3 | Waymo | &cross; | 4 | 71.2 | [link](https://github.com/Pointcept/Pointcept/blob/main/configs/waymo/semseg-pt-v3m1-0-base.py) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tensorboard) | [link](https://huggingface.co/Pointcept/PointTransformerV3/tree/main/waymo-semseg-pt-v3m1-0-base) (log only) |
+| PTv3 + PPT | Waymo | &check; | 8 | | | | |
+
+_**\*Released model weights are trained for v1.5.1, weights for v1.5.2 and later is still ongoing.**_
 
 - **PTv2 mode2**
 
@@ -523,10 +620,14 @@ Example running scripts are as follows:
 sh scripts/train.sh -g 4 -d scannet -c semseg-pt-v2m2-0-base -n semseg-pt-v2m2-0-base
 sh scripts/train.sh -g 4 -d scannet -c semseg-pt-v2m2-3-lovasz -n semseg-pt-v2m2-3-lovasz
 
-# ScanNet test benchmark (train on train set and val set)
-sh scripts/train.sh -g 4 -d scannet -c semseg-pt-v2m2-1-benchmark-submit -n semseg-pt-v2m2-1-benchmark-submit
+# ScanNet test
+sh scripts/train.sh -g 4 -d scannet -c semseg-pt-v2m2-1-submit -n semseg-pt-v2m2-1-submit
 # ScanNet200
 sh scripts/train.sh -g 4 -d scannet200 -c semseg-pt-v2m2-0-base -n semseg-pt-v2m2-0-base
+# ScanNet++
+sh scripts/train.sh -g 4 -d scannetpp -c semseg-pt-v2m2-0-base -n semseg-pt-v2m2-0-base
+# ScanNet++ test
+sh scripts/train.sh -g 4 -d scannetpp -c semseg-pt-v2m2-1-submit -n semseg-pt-v2m2-1-submit
 # S3DIS
 sh scripts/train.sh -g 4 -d s3dis -c semseg-pt-v2m2-0-base -n semseg-pt-v2m2-0-base
 # SemanticKITTI
