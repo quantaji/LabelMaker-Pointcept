@@ -17,11 +17,16 @@ export CUDA_VISIBLE_DEVICES="0"
 
 INTERPRETER_PATH=/home/guangda/miniconda3/envs/labelmaker-pointcept/bin/python
 NUM_GPU=1
-DATASET_NAME=scannet
-CONFIG_NAME="semseg-pt-v3m1-1-finetune"
+# DATASET_NAME=scannet
+DATASET_NAME=scannetpp
+CONFIG_NAME="semseg-pt-v3m1-1-finetune-debug"
 # CONFIG_NAME="semseg-pt-v3m1-0-base-wn199"
-EXP_NAME=ppt_pretrain_scannet_finetune_train
+# EXP_NAME=ppt_pretrain_scannet_finetune_train
 # EXP_NAME=arkitscenes_labelmaker_wn199_pretrain
+# EXP_NAME=ppt_pretrain_scannet_finetune_train_attn_alc_linear
+# EXP_NAME=ppt_pretrain_scannet_finetune_train_attn_scannet_linear
+# EXP_NAME=ppt_scannet200_pretrain_scannet_finetune_train_attn_alc_linear
+EXP_NAME=debug_dataset
 
 sh scripts/train.sh \
     -p ${INTERPRETER_PATH} \
@@ -29,3 +34,4 @@ sh scripts/train.sh \
     -d ${DATASET_NAME} \
     -c ${CONFIG_NAME} \
     -n ${EXP_NAME}
+

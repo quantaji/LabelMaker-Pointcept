@@ -1,7 +1,9 @@
 _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
-weight = "exp/scannet/scannet_s3dis_structure3d_alc_joint_training/model/model_modified.pth"
+# weight = "exp/scannet/scannet_s3dis_structure3d_alc_joint_training/model/model_modified.pth"
+# weight = "exp/scannet/scannet_s3dis_structure3d_alc_joint_training/model/model_modified_scannet.pth"
+weight = "exp/scannet200/scannet200_s3dis_structure3d_alc_joint_training/model/model_modified_scannet.pth"
 batch_size = 12  # bs: total bs in all gpus
 num_worker = 24
 mix_prob = 0.8
@@ -124,7 +126,8 @@ data = dict(
             dict(type="CenterShift", apply_z=False),
             dict(type="NormalizeColor"),
             # dict(type="ShufflePoint"),
-            dict(type="Add", keys_dict=dict(condition="ScanNet")),
+            # dict(type="Add", keys_dict=dict(condition="ScanNet")),
+            dict(type="Add", keys_dict=dict(condition="ALC")),
             dict(type="ToTensor"),
             dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
         ],
@@ -145,7 +148,8 @@ data = dict(
             ),
             dict(type="CenterShift", apply_z=False),
             dict(type="NormalizeColor"),
-            dict(type="Add", keys_dict=dict(condition="ScanNet")),
+            # dict(type="Add", keys_dict=dict(condition="ScanNet")),
+            dict(type="Add", keys_dict=dict(condition="ALC")),
             dict(type="ToTensor"),
             dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
         ],
@@ -172,7 +176,8 @@ data = dict(
             crop=None,
             post_transform=[
                 dict(type="CenterShift", apply_z=False),
-                dict(type="Add", keys_dict=dict(condition="ScanNet")),
+                # dict(type="Add", keys_dict=dict(condition="ScanNet")),
+                dict(type="Add", keys_dict=dict(condition="ALC")),
                 dict(type="ToTensor"),
                 dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
             ],

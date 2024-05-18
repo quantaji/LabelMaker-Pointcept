@@ -919,7 +919,21 @@ data = dict(
         test_cfg=dict(
             voxelize=dict(type="GridSample", grid_size=0.02, hash_type="fnv", mode="test", keys=("coord", "color", "normal"), return_grid_coord=True),
             crop=None,
-            post_transform=[dict(type="CenterShift", apply_z=False), dict(type="Add", keys_dict=dict(condition="ScanNet")), dict(type="ToTensor"), dict(type="Collect", keys=("coord", "grid_coord", "index", "condition"), feat_keys=("color", "normal"))],
+            post_transform=[
+                dict(type="CenterShift", apply_z=False),
+                dict(type="Add", keys_dict=dict(condition="ScanNet")),
+                dict(type="ToTensor"),
+                dict(
+                    type="Collect",
+                    keys=(
+                        "coord",
+                        "grid_coord",
+                        "index",
+                        "condition",
+                    ),
+                    feat_keys=("color", "normal"),
+                ),
+            ],
             aug_transform=[
                 [{"type": "RandomRotateTargetAngle", "angle": [0], "axis": "z", "center": [0, 0, 0], "p": 1}],
                 [{"type": "RandomRotateTargetAngle", "angle": [0.5], "axis": "z", "center": [0, 0, 0], "p": 1}],
