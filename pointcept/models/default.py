@@ -58,7 +58,8 @@ class DefaultSegmentorV2(nn.Module):
 
     def forward(self, input_dict):
         point = Point(input_dict)
-        point = self.backbone(point)
+        with self.optional_freeze():
+            point = self.backbone(point)
         # Backbone added after v1.5.0 return Point instead of feat and use DefaultSegmentorV2
         # TODO: remove this part after make all backbone return Point only.
         if isinstance(point, Point):

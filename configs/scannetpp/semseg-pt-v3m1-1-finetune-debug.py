@@ -1,18 +1,19 @@
-from pointcept.datasets.preprocessing.scannetpp.preprocess_scannetpp import SCANNETPP_NAMES
-
-_base_ = ["../_base_/default_runtime.py"]
+_base_ = [
+    "../_base_/default_runtime.py",
+    "../_base_/dataset/scannetpp.py",
+]
 
 # misc custom setting
 weight = "exp/scannet200/scannet200_s3dis_structure3d_alc_joint_training/model/model_modified_scannetpp.pth"
-batch_size = 12  # bs: total bs in all gpus
-num_worker = 24
+batch_size = 2  # bs: total bs in all gpus
+num_worker = 4
 mix_prob = 0.8
 empty_cache = False
 enable_amp = True
-evaluate = True
-test_only = False
-sync_bn = False
-find_unused_parameters = True
+# evaluate = True
+# test_only = False
+# sync_bn = False
+# find_unused_parameters = True
 
 # model settings
 model = dict(
@@ -47,6 +48,8 @@ model = dict(
         cls_mode=False,
         pdnorm_bn=True,
         pdnorm_ln=True,
+        # pdnorm_bn=False,
+        # pdnorm_ln=False,
         pdnorm_decouple=True,
         pdnorm_adaptive=False,
         pdnorm_affine=True,
@@ -87,16 +90,15 @@ param_dicts = [dict(keyword="block", lr=0.00006)]
 # param_dicts = [dict(keyword="block", lr=0.0006)]
 
 # dataset settings
-dataset_type = "ScanNetPlusPlusDataset"
+dataset_type = "ScanNetPPDataset"
 data_root = "data/scannetpp"
 
 data = dict(
     num_classes=100,
     ignore_index=-1,
-    names=SCANNETPP_NAMES,
     train=dict(
         type=dataset_type,
-        split="train",
+        split="train_grid1mm_chunk6x6_stride3x3",
         data_root=data_root,
         transform=[
             dict(type="CenterShift", apply_z=True),
@@ -122,13 +124,17 @@ data = dict(
                 mode="train",
                 return_grid_coord=True,
             ),
-            dict(type="SphereCrop", point_max=102400, mode="random"),
+            dict(type="SphereCrop", point_max=204800, mode="random"),
             dict(type="CenterShift", apply_z=False),
             dict(type="NormalizeColor"),
             # dict(type="ShufflePoint"),
-            dict(type="Add", keys_dict=dict(condition="ALC")),
+            dict(type="Add", keys_dict={"condition": "ALC"}),
             dict(type="ToTensor"),
-            dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
+            dict(
+                type="Collect",
+                keys=("coord", "grid_coord", "segment", "condition"),
+                feat_keys=("color", "normal"),
+            ),
         ],
         test_mode=False,
     ),
@@ -147,9 +153,13 @@ data = dict(
             ),
             dict(type="CenterShift", apply_z=False),
             dict(type="NormalizeColor"),
-            dict(type="Add", keys_dict=dict(condition="ALC")),
+            dict(type="Add", keys_dict={"condition": "ALC"}),
             dict(type="ToTensor"),
-            dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
+            dict(
+                type="Collect",
+                keys=("coord", "grid_coord", "segment", "condition"),
+                feat_keys=("color", "normal"),
+            ),
         ],
         test_mode=False,
     ),
@@ -160,6 +170,15 @@ data = dict(
         transform=[
             dict(type="CenterShift", apply_z=True),
             dict(type="NormalizeColor"),
+            dict(type="Copy", keys_dict={"segment": "origin_segment"}),
+            dict(
+                type="GridSample",
+                grid_size=0.01,
+                hash_type="fnv",
+                mode="train",
+                keys=("coord", "color", "normal", "segment"),
+                return_inverse=True,
+            ),
         ],
         test_mode=True,
         test_cfg=dict(
@@ -174,9 +193,13 @@ data = dict(
             crop=None,
             post_transform=[
                 dict(type="CenterShift", apply_z=False),
-                dict(type="Add", keys_dict=dict(condition="ALC")),
+                dict(type="Add", keys_dict={"condition": "ALC"}),
                 dict(type="ToTensor"),
-                dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
+                dict(
+                    type="Collect",
+                    keys=("coord", "grid_coord", "index", "condition"),
+                    feat_keys=("color", "normal"),
+                ),
             ],
             aug_transform=[
                 [

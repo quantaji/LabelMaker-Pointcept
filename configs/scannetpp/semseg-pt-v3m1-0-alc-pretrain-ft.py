@@ -3,9 +3,10 @@ _base_ = [
     "../_base_/dataset/scannetpp.py",
 ]
 
+weight = "exp/alc/arkitscenes_labelmaker_wn199_pretrain/model/model_modified_scannetpp.pth"
 # misc custom setting
-batch_size = 4  # bs: total bs in all gpus
-num_worker = 8
+batch_size = 12  # bs: total bs in all gpus
+num_worker = 24
 mix_prob = 0.8
 empty_cache = False
 enable_amp = True
@@ -57,7 +58,8 @@ model = dict(
 )
 
 # scheduler settings
-epoch = 800
+epoch = 240
+eval_epoch = 240
 optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
 scheduler = dict(
     type="OneCycleLR",
