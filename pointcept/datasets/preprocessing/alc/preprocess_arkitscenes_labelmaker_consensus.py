@@ -14,7 +14,6 @@ from itertools import repeat
 from pathlib import Path
 
 import numpy as np
-import open3d as o3d
 import pandas as pd
 import plyfile
 from labelmaker import label_mappings
