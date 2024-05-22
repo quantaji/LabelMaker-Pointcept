@@ -51,6 +51,7 @@ model = dict(
         pdnorm_affine=True,
         pdnorm_conditions=(
             "S3DIS",
+            # "ScanNet",
             "Structured3D",
             "ALC",
             "ScanNet200",
@@ -59,7 +60,13 @@ model = dict(
     criteria=[dict(type="CrossEntropyLoss", loss_weight=1.0, ignore_index=-1), dict(type="LovaszLoss", mode="multiclass", loss_weight=1.0, ignore_index=-1)],
     backbone_out_channels=64,
     context_channels=256,
-    conditions=("Structured3D", "ScanNet", "S3DIS", "ALC", "ScanNet200"),
+    conditions=(
+        "S3DIS",
+        # "ScanNet",
+        "Structured3D",
+        "ALC",
+        "ScanNet200",
+    ),
     template="[x]",
     clip_model="ViT-B/16",
     class_name=(
@@ -361,8 +368,8 @@ model = dict(
         "mattress",
     ),
     valid_index=(
-        (0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 11, 12, 13, 15, 20, 22, 24, 25, 27, 34),
         (0, 1, 4, 5, 6, 7, 8, 10, 19, 29, 30, 31, 32),
+        (0, 1, 2, 3, 4, 5, 6, 7, 8, 11, 13, 14, 15, 16, 17, 18, 19, 20, 21, 23, 25, 26, 33, 34, 35),
         (
             0,
             4,
