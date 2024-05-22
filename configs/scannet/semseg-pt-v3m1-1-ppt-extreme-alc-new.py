@@ -554,8 +554,10 @@ model = dict(
 )
 
 # optimizer
-epoch = 1600
-eval_epoch = 1600
+epoch = 800
+eval_epoch = 800
+# epoch = 1600
+# eval_epoch = 1600
 optimizer = dict(type="AdamW", lr=0.005, weight_decay=0.05)
 scheduler = dict(
     type="OneCycleLR",
@@ -575,6 +577,7 @@ data = dict(
     train=dict(
         type="ConcatDataset",
         datasets=[
+            # Structured3DDataset
             dict(
                 type="Structured3DDataset",
                 split=["train", "val", "test"],
@@ -604,6 +607,7 @@ data = dict(
                 test_mode=False,
                 loop=1,
             ),
+            # ScanNetDataset
             dict(
                 type="ScanNetDataset",
                 split="train",
@@ -633,6 +637,7 @@ data = dict(
                 test_mode=False,
                 loop=1,
             ),
+            # S3DISDataset
             dict(
                 type="S3DISDataset",
                 split=("Area_1", "Area_2", "Area_3", "Area_4", "Area_6"),
@@ -661,6 +666,7 @@ data = dict(
                 test_mode=False,
                 loop=1,
             ),
+            # ALC
             dict(
                 type="ARKitScenesLabelMakerConsensusDataset",
                 split=["train", "val"],
