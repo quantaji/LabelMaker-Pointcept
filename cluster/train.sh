@@ -16,7 +16,7 @@ cd /raid/LabelMaker-Pointcept
 
 INTERPRETER_PATH=/home/blum/miniconda3/envs/labelmaker-pointcept/bin/python
 
-export CUDA_VISIBLE_DEVICES="0"
+export CUDA_VISIBLE_DEVICES="0,1,2,3"
 
 NUM_GPU=4
 DATASET_NAME=scannet
