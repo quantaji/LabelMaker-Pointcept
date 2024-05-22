@@ -31,6 +31,7 @@ EXP_NAME=ppt_pretrain_scannet_finetune_train_attn_alc_full_train_val
 # CHECKPOINT_NAME="model_best"
 CHECKPOINT_NAME="model_last"
 
+
 export OPENBLAS_NUM_THREADS=1
 
 sh scripts/test.sh \
@@ -38,4 +39,5 @@ sh scripts/test.sh \
     -g ${NUM_GPU} \
     -d ${DATASET_NAME} \
     -n ${EXP_NAME} \
+    -r ${RESUME} \
     -w ${CHECKPOINT_NAME}
