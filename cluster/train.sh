@@ -27,10 +27,10 @@ CONFIG_NAME="semseg-pt-v3m1-1-ppt-extreme-alc-new"
 EXP_NAME=joint_pretrain_alc
 RESUME=false
 
-sh scripts/test.sh \
+sh scripts/train.sh \
     -p ${INTERPRETER_PATH} \
     -g ${NUM_GPU} \
     -d ${DATASET_NAME} \
+    -c ${CONFIG_NAME} \
     -n ${EXP_NAME} \
-    -r ${RESUME} \
-    -w ${CHECKPOINT_NAME}
+    -r ${RESUME}
