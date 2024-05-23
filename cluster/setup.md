@@ -15,9 +15,9 @@ srun \
 
 ```sh
 srun \
-    --mem=64GB \
+    --mem=256GB \
     --export ALL \
-    -c 36 \
+    -c 48 \
     --gres=gpu:nvidia_a100-sxm4-80gb:4 \
     --container-name=labelmaker \
     --job-name="labelmaker" \

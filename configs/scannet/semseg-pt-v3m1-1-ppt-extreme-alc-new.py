@@ -2,7 +2,7 @@ _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
 batch_size = 24  # bs: total bs in all gpus
-num_worker = 36
+num_worker = 48
 mix_prob = 0.8
 empty_cache = False
 enable_amp = True
@@ -584,36 +584,36 @@ data = dict(
     train=dict(
         type="ConcatDataset",
         datasets=[
-            # Structured3DDataset
-            dict(
-                type="Structured3DDataset",
-                split=["train", "val", "test"],
-                data_root="data/structured3d",
-                transform=[
-                    dict(type="CenterShift", apply_z=True),
-                    dict(type="RandomDropout", dropout_ratio=0.2, dropout_application_ratio=0.2),
-                    dict(type="RandomRotate", angle=[-1, 1], axis="z", center=[0, 0, 0], p=0.5),
-                    dict(type="RandomRotate", angle=[-0.015625, 0.015625], axis="x", p=0.5),
-                    dict(type="RandomRotate", angle=[-0.015625, 0.015625], axis="y", p=0.5),
-                    dict(type="RandomScale", scale=[0.9, 1.1]),
-                    dict(type="RandomFlip", p=0.5),
-                    dict(type="RandomJitter", sigma=0.005, clip=0.02),
-                    dict(type="ElasticDistortion", distortion_params=[[0.2, 0.4], [0.8, 1.6]]),
-                    dict(type="ChromaticAutoContrast", p=0.2, blend_factor=None),
-                    dict(type="ChromaticTranslation", p=0.95, ratio=0.05),
-                    dict(type="ChromaticJitter", p=0.95, std=0.05),
-                    dict(type="GridSample", grid_size=0.02, hash_type="fnv", mode="train", return_grid_coord=True),
-                    dict(type="SphereCrop", sample_rate=0.8, mode="random"),
-                    dict(type="SphereCrop", point_max=102400, mode="random"),
-                    dict(type="CenterShift", apply_z=False),
-                    dict(type="NormalizeColor"),
-                    dict(type="Add", keys_dict=dict(condition="Structured3D")),
-                    dict(type="ToTensor"),
-                    dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
-                ],
-                test_mode=False,
-                loop=1,
-            ),
+            # # Structured3DDataset
+            # dict(
+            #     type="Structured3DDataset",
+            #     split=["train", "val", "test"],
+            #     data_root="data/structured3d",
+            #     transform=[
+            #         dict(type="CenterShift", apply_z=True),
+            #         dict(type="RandomDropout", dropout_ratio=0.2, dropout_application_ratio=0.2),
+            #         dict(type="RandomRotate", angle=[-1, 1], axis="z", center=[0, 0, 0], p=0.5),
+            #         dict(type="RandomRotate", angle=[-0.015625, 0.015625], axis="x", p=0.5),
+            #         dict(type="RandomRotate", angle=[-0.015625, 0.015625], axis="y", p=0.5),
+            #         dict(type="RandomScale", scale=[0.9, 1.1]),
+            #         dict(type="RandomFlip", p=0.5),
+            #         dict(type="RandomJitter", sigma=0.005, clip=0.02),
+            #         dict(type="ElasticDistortion", distortion_params=[[0.2, 0.4], [0.8, 1.6]]),
+            #         dict(type="ChromaticAutoContrast", p=0.2, blend_factor=None),
+            #         dict(type="ChromaticTranslation", p=0.95, ratio=0.05),
+            #         dict(type="ChromaticJitter", p=0.95, std=0.05),
+            #         dict(type="GridSample", grid_size=0.02, hash_type="fnv", mode="train", return_grid_coord=True),
+            #         dict(type="SphereCrop", sample_rate=0.8, mode="random"),
+            #         dict(type="SphereCrop", point_max=102400, mode="random"),
+            #         dict(type="CenterShift", apply_z=False),
+            #         dict(type="NormalizeColor"),
+            #         dict(type="Add", keys_dict=dict(condition="Structured3D")),
+            #         dict(type="ToTensor"),
+            #         dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
+            #     ],
+            #     test_mode=False,
+            #     loop=1,
+            # ),
             # ScanNetDataset
             dict(
                 type="ScanNetDataset",
@@ -715,6 +715,7 @@ data = dict(
                     ),
                 ],
                 test_mode=False,
+                loop=1,
             ),
         ],
         loop=1,
@@ -767,3 +768,13 @@ data = dict(
         ),
     ),
 )
+
+# hook
+hooks = [
+    dict(type="CheckpointLoader"),
+    dict(type="IterationTimer", warmup_iter=2),
+    dict(type="InformationWriter"),
+    dict(type="SemSegEvaluator"),
+    dict(type="CheckpointSaver", save_freq=None),
+    dict(type="PreciseEvaluator", test_last=True),
+]
