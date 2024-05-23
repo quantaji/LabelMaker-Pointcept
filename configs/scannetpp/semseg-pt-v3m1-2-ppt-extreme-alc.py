@@ -59,7 +59,7 @@ model = dict(
     backbone_out_channels=64,
     context_channels=256,
     conditions=("ScanNet", "ScanNet++", "S3DIS", "Structured3D", "ALC"),
-    num_classes=(200, 100, 13, 25),
+    num_classes=(200, 100, 13, 25, 185),
 )
 
 # scheduler settings
