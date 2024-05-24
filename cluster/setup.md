@@ -1,12 +1,12 @@
 ```sh
 srun \
-    --mem=64GB \
+    --mem=128GB \
     --export ALL \
-    -c 36 \
-    --gres=gpu:nvidia_a100-sxm4-40gb:8 \
-    --container-name=labelmaker \
-    --job-name="labelmaker" \
-    -p GPU8 \
+    -c 48 \
+    --gres=gpu:nvidia_a100-sxm4-80gb:4 \
+    --container-name=labelmaker-8 \
+    --job-name="labelmaker-8" \
+    -p GPU4 \
     --container-image=nvcr.io/ml2r/interactive_cuda:12.2.0 \
     --mail-user=guanji@student.ethz.ch \
     --mail-type=ALL \

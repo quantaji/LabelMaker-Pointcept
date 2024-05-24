@@ -28,3 +28,24 @@ rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/scratch/quanta/D
 
 ## checksum
 rsync -r --checksum -v -e ssh guangda@129.132.245.59:/home/guangda/repos/LabelMaker-Pointcept/data/* /raid/LabelMaker-Pointcept/data/
+
+## rsync scannet mix3d data for evaluation
+rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/mnt/LabelMaker/labelmaker-mix3d/data/processed/scannet/* /home/guangda/repos/LabelMaker-Pointcept/data/mix3d_preprocessed/scannet/
+
+rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/mnt/LabelMaker/labelmaker-mix3d/data/processed/scannet200/* /home/guangda/repos/LabelMaker-Pointcept/data/mix3d_preprocessed/scannet200/
+
+## rsync original ptv3 checkpoints to this repo
+rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/scratch/quanta/Models/PointTransformerV3/scannet-semseg-pt-v3m1-0-base/* /home/guangda/repos/LabelMaker-Pointcept/exp/scannet/original-semseg-pt-v3m1-0-base/
+
+rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/scratch/quanta/Models/PointTransformerV3/scannet-semseg-pt-v3m1-1-ppt-extreme/* /home/guangda/repos/LabelMaker-Pointcept/exp/scannet/original-semseg-pt-v3m1-1-ppt-extreme/
+
+rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/scratch/quanta/Models/PointTransformerV3/scannet200-semseg-pt-v3m1-0-base/* /home/guangda/repos/LabelMaker-Pointcept/exp/scannet200/original-semseg-pt-v3m1-0-base/
+
+# rsync mix3d exp
+rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/mnt/LabelMaker/labelmaker-mix3d/saved/evaluation_scannet200/* /home/guangda/repos/labelmaker-mix3d-exps/evaluation_scannet200/
+
+rsync -r --ignore-existing -v -e ssh /home/guangda/repos/LabelMaker-Pointcept/exp/* quanta@rowletew.hopto.org:/mnt/LabelMaker/LabelMaker-Pointcept/exp
+
+rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/mnt/LabelMaker/LabelMaker-Pointcept/exp/*  /home/guangda/repos/LabelMaker-Pointcept/exp/
+
+rsync -r --ignore-existing -v -e ssh /raid/LabelMaker-Pointcept/exp/* guangda@129.132.245.59:/home/guangda/repos/LabelMaker-Pointcept/exp/ 

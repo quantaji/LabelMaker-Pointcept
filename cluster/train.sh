@@ -24,8 +24,9 @@ NUM_GPU=4
 DATASET_NAME=scannetpp
 # CONFIG_NAME="semseg-pt-v3m1-0-ft"
 # CONFIG_NAME="semseg-pt-v3m1-1-ppt-extreme-alc-new"
-CONFIG_NAME="semseg-pt-v3m1-2-ppt-extreme-alc"
-EXP_NAME=joint_pretrain_alc
+# CONFIG_NAME="semseg-pt-v3m1-2-ppt-extreme-alc"
+CONFIG_NAME="semseg-pt-v3m1-2-ppt-extreme-alc-submit"
+EXP_NAME=joint_pretrain_alc_train_val
 RESUME=false
 
 sh scripts/train.sh \
