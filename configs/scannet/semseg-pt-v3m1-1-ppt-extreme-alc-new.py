@@ -561,8 +561,10 @@ model = dict(
 )
 
 # optimizer
-epoch = 800
-eval_epoch = 800
+# epoch = 800
+# eval_epoch = 800
+epoch = 1000
+eval_epoch = 1000
 # epoch = 1600
 # eval_epoch = 1600
 optimizer = dict(type="AdamW", lr=0.005, weight_decay=0.05)
