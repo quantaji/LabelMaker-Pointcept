@@ -61,7 +61,7 @@ model = dict(
     backbone_out_channels=64,
     context_channels=256,
     conditions=(
-        "S3DIS",
+        # "S3DIS",
         # "ScanNet",
         "Structured3D",
         "ALC",
