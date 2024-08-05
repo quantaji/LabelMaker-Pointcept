@@ -46,6 +46,17 @@ rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/mnt/LabelMaker/l
 
 rsync -r --ignore-existing -v -e ssh /home/guangda/repos/LabelMaker-Pointcept/exp/* quanta@rowletew.hopto.org:/mnt/LabelMaker/LabelMaker-Pointcept/exp
 
-rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/mnt/LabelMaker/LabelMaker-Pointcept/exp/*  /home/guangda/repos/LabelMaker-Pointcept/exp/
+rsync -r --ignore-existing -v -e ssh quanta@rowletew.hopto.org:/mnt/LabelMaker/LabelMaker-Pointcept/exp/* /home/guangda/repos/LabelMaker-Pointcept/exp/
 
-rsync -r --ignore-existing -v -e ssh /raid/LabelMaker-Pointcept/exp/* guangda@129.132.245.59:/home/guangda/repos/LabelMaker-Pointcept/exp/ 
+rsync -r --ignore-existing -v -e ssh /raid/LabelMaker-Pointcept/exp/* guangda@129.132.245.59:/home/guangda/repos/LabelMaker-Pointcept/exp/
+
+rsync -r --ignore-existing -v -e "ssh -p 22000" ml2ran11s1:/raid/LabelMaker-Pointcept/* /raid/LabelMaker-Pointcept/
+
+rsync -r --ignore-existing -v -e ssh /cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/scannetpp/baseline_from_scratch/* guangda@129.132.245.59:/home/guangda/repos/LabelMaker-Pointcept/exp/scannetpp/baseline_from_scratch/
+
+rsync -r --ignore-existing -v -e ssh /cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/scannet200/ppt_pretrain_scannet200_finetune_retry/* guangda@129.132.245.59:/home/guangda/repos/LabelMaker-Pointcept/exp/scannet200/ppt_pretrain_scannet200_finetune_retry/
+
+# rsync -r --ignore-existing -v -e ssh guangda@129.132.245.59:/home/guangda/repos/LabelMaker-Pointcept/exp/scannet200/ppt_pretrain_scannet200_finetune_retry/* /mnt/LabelMaker/LabelMaker-Pointcept/exp/scannet200/ppt_pretrain_scannet200_finetune_retry/
+
+
+rsync -r --ignore-existing -v -e ssh /home/guangda/repos/LabelMaker-Pointcept/exp/scannet200/ppt_pretrain_scannet200_finetune_retry/* quanta@rowletew.hopto.org:/mnt/LabelMaker/LabelMaker-Pointcept/exp/scannet200/ppt_pretrain_scannet200_finetune_retry/
