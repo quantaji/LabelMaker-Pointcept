@@ -13,9 +13,30 @@ evaluate = True
 find_unused_parameters = True
 weight = "exp/scannet/semseg-pt-v3m1-1-ppt-extreme-alc-20240823-massive-no-val/model/model_mod_insseg.pth"
 
-class_names = CLASS_LABELS_200
-num_classes = 200
-segment_ignore_index = (-1, 0, 2)  # in scannet 20 this is (-1, 0, 1)
+class_names = [
+    "wall",
+    "floor",
+    "cabinet",
+    "bed",
+    "chair",
+    "sofa",
+    "table",
+    "door",
+    "window",
+    "bookshelf",
+    "picture",
+    "counter",
+    "desk",
+    "curtain",
+    "refridgerator",
+    "shower curtain",
+    "toilet",
+    "sink",
+    "bathtub",
+    "otherfurniture",
+]
+num_classes = 20
+segment_ignore_index = (-1, 0, 1)
 
 model = dict(
     type="PG-v1m1",
@@ -104,7 +125,7 @@ optimizer = dict(
 scheduler = dict(type="PolyLR")
 
 # dataset settings
-dataset_type = "ScanNet200DatasetV2"
+dataset_type = "ScanNetDatasetV2"
 data_root = "data/scannet"
 
 data = dict(
@@ -156,7 +177,7 @@ data = dict(
                 segment_ignore_index=segment_ignore_index,
                 instance_ignore_index=-1,
             ),
-            dict(type="Add", keys_dict={"condition": "ScanNet200"}),
+            dict(type="Add", keys_dict={"condition": "ScanNet"}),
             dict(type="ToTensor"),
             dict(
                 type="Collect",
@@ -204,7 +225,7 @@ data = dict(
                 segment_ignore_index=segment_ignore_index,
                 instance_ignore_index=-1,
             ),
-            dict(type="Add", keys_dict={"condition": "ScanNet200"}),
+            dict(type="Add", keys_dict={"condition": "ScanNet"}),
             dict(type="ToTensor"),
             dict(
                 type="Collect",

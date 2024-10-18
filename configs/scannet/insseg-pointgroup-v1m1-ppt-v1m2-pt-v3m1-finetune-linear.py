@@ -1,6 +1,3 @@
-from pointcept.datasets.preprocessing.scannet.meta_data.scannet200_constants import (
-    CLASS_LABELS_200, )
-
 _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
@@ -13,9 +10,30 @@ evaluate = True
 find_unused_parameters = True
 weight = "exp/scannet/semseg-pt-v3m1-1-ppt-extreme-alc-20240823-massive-no-val/model/model_mod_insseg.pth"
 
-class_names = CLASS_LABELS_200
-num_classes = 200
-segment_ignore_index = (-1, 0, 2)  # in scannet 20 this is (-1, 0, 1)
+class_names = [
+    "wall",
+    "floor",
+    "cabinet",
+    "bed",
+    "chair",
+    "sofa",
+    "table",
+    "door",
+    "window",
+    "bookshelf",
+    "picture",
+    "counter",
+    "desk",
+    "curtain",
+    "refridgerator",
+    "shower curtain",
+    "toilet",
+    "sink",
+    "bathtub",
+    "otherfurniture",
+]
+num_classes = 20
+segment_ignore_index = (-1, 0, 1)
 
 model = dict(
     type="PG-v1m1",
@@ -94,17 +112,19 @@ model = dict(
 
 # scheduler settings
 epoch = 800
-optimizer = dict(
-    type="SGD",
-    lr=0.1,
-    momentum=0.9,
-    weight_decay=0.0001,
-    nesterov=True,
+optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
+scheduler = dict(
+    type="OneCycleLR",
+    max_lr=[0.006, 0.0006],
+    pct_start=0.05,
+    anneal_strategy="cos",
+    div_factor=10.0,
+    final_div_factor=1000.0,
 )
-scheduler = dict(type="PolyLR")
+param_dicts = [dict(keyword="block", lr=0.0006)]
 
 # dataset settings
-dataset_type = "ScanNet200DatasetV2"
+dataset_type = "ScanNetDataset"
 data_root = "data/scannet"
 
 data = dict(
@@ -156,7 +176,7 @@ data = dict(
                 segment_ignore_index=segment_ignore_index,
                 instance_ignore_index=-1,
             ),
-            dict(type="Add", keys_dict={"condition": "ScanNet200"}),
+            dict(type="Add", keys_dict={"condition": "ScanNet"}),
             dict(type="ToTensor"),
             dict(
                 type="Collect",
@@ -204,7 +224,7 @@ data = dict(
                 segment_ignore_index=segment_ignore_index,
                 instance_ignore_index=-1,
             ),
-            dict(type="Add", keys_dict={"condition": "ScanNet200"}),
+            dict(type="Add", keys_dict={"condition": "ScanNet"}),
             dict(type="ToTensor"),
             dict(
                 type="Collect",

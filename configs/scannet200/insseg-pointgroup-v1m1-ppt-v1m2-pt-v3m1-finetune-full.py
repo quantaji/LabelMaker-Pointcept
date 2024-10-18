@@ -88,23 +88,25 @@ model = dict(
     cluster_closed_points=300,
     cluster_propose_points=100,
     cluster_min_points=50,
-    freeze_backbone=True,
-    # freeze_backbone=False,
+    # freeze_backbone=True,
+    freeze_backbone=False,
 )
 
 # scheduler settings
 epoch = 800
-optimizer = dict(
-    type="SGD",
-    lr=0.1,
-    momentum=0.9,
-    weight_decay=0.0001,
-    nesterov=True,
+optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
+scheduler = dict(
+    type="OneCycleLR",
+    max_lr=[0.006, 0.0006],
+    pct_start=0.05,
+    anneal_strategy="cos",
+    div_factor=10.0,
+    final_div_factor=1000.0,
 )
-scheduler = dict(type="PolyLR")
+param_dicts = [dict(keyword="block", lr=0.0006)]
 
 # dataset settings
-dataset_type = "ScanNet200DatasetV2"
+dataset_type = "ScanNet200Dataset"
 data_root = "data/scannet"
 
 data = dict(

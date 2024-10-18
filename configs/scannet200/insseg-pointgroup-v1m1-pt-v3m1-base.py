@@ -11,7 +11,6 @@ empty_cache = False
 enable_amp = True
 evaluate = True
 find_unused_parameters = True
-weight = "exp/scannet/semseg-pt-v3m1-1-ppt-extreme-alc-20240823-massive-no-val/model/model_mod_insseg.pth"
 
 class_names = CLASS_LABELS_200
 num_classes = 200
@@ -20,64 +19,37 @@ segment_ignore_index = (-1, 0, 2)  # in scannet 20 this is (-1, 0, 1)
 model = dict(
     type="PG-v1m1",
     backbone=dict(
-        type="PPT-v1m2",
-        backbone=dict(
-            type="PT-v3m1",
-            in_channels=6,
-            order=("z", "z-trans", "hilbert", "hilbert-trans"),
-            stride=(2, 2, 2, 2),
-            enc_depths=(3, 3, 3, 6, 3),
-            enc_channels=(48, 96, 192, 384, 512),
-            enc_num_head=(3, 6, 12, 24, 32),
-            enc_patch_size=(1024, 1024, 1024, 1024, 1024),
-            dec_depths=(3, 3, 3, 3),
-            dec_channels=(64, 96, 192, 384),
-            dec_num_head=(4, 6, 12, 24),
-            dec_patch_size=(1024, 1024, 1024, 1024),
-            mlp_ratio=4,
-            qkv_bias=True,
-            qk_scale=None,
-            attn_drop=0.0,
-            proj_drop=0.0,
-            drop_path=0.3,
-            shuffle_orders=True,
-            pre_norm=True,
-            enable_rpe=False,
-            enable_flash=True,
-            upcast_attention=False,
-            upcast_softmax=False,
-            cls_mode=False,
-            pdnorm_bn=True,
-            pdnorm_ln=True,
-            pdnorm_decouple=True,
-            pdnorm_adaptive=False,
-            pdnorm_affine=True,
-            pdnorm_conditions=(
-                "ScanNet",
-                "ScanNet200",
-                "ScanNet++",
-                "Structured3D",
-                "ALC",
-            ),
-        ),
-        criteria=[
-            dict(type="CrossEntropyLoss", loss_weight=1.0, ignore_index=-1),
-            dict(type="LovaszLoss",
-                 mode="multiclass",
-                 loss_weight=1.0,
-                 ignore_index=-1)
-        ],
-        backbone_out_channels=64,
-        backbone_mode=True,
-        context_channels=256,
-        conditions=(
-            "ScanNet",
-            "ScanNet200",
-            "ScanNet++",
-            "Structured3D",
-            "ALC",
-        ),
-        num_classes=(20, 200, 100, 25, 185),
+        type="PT-v3m1",
+        in_channels=6,
+        order=["z", "z-trans", "hilbert", "hilbert-trans"],
+        stride=(2, 2, 2, 2),
+        enc_depths=(2, 2, 2, 6, 2),
+        enc_channels=(32, 64, 128, 256, 512),
+        enc_num_head=(2, 4, 8, 16, 32),
+        enc_patch_size=(1024, 1024, 1024, 1024, 1024),
+        dec_depths=(2, 2, 2, 2),
+        dec_channels=(64, 64, 128, 256),
+        dec_num_head=(4, 4, 8, 16),
+        dec_patch_size=(1024, 1024, 1024, 1024),
+        mlp_ratio=4,
+        qkv_bias=True,
+        qk_scale=None,
+        attn_drop=0.0,
+        proj_drop=0.0,
+        drop_path=0.3,
+        shuffle_orders=True,
+        pre_norm=True,
+        enable_rpe=False,
+        enable_flash=True,
+        upcast_attention=False,
+        upcast_softmax=False,
+        cls_mode=False,
+        pdnorm_bn=False,
+        pdnorm_ln=False,
+        pdnorm_decouple=True,
+        pdnorm_adaptive=False,
+        pdnorm_affine=True,
+        pdnorm_conditions=("ScanNet", "S3DIS", "Structured3D"),
     ),
     backbone_out_channels=64,
     semantic_num_classes=num_classes,
@@ -88,23 +60,25 @@ model = dict(
     cluster_closed_points=300,
     cluster_propose_points=100,
     cluster_min_points=50,
-    freeze_backbone=True,
-    # freeze_backbone=False,
+    # freeze_backbone=True,
+    freeze_backbone=False,
 )
 
 # scheduler settings
 epoch = 800
-optimizer = dict(
-    type="SGD",
-    lr=0.1,
-    momentum=0.9,
-    weight_decay=0.0001,
-    nesterov=True,
+optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
+scheduler = dict(
+    type="OneCycleLR",
+    max_lr=[0.006, 0.0006],
+    pct_start=0.05,
+    anneal_strategy="cos",
+    div_factor=10.0,
+    final_div_factor=1000.0,
 )
-scheduler = dict(type="PolyLR")
+param_dicts = [dict(keyword="block", lr=0.0006)]
 
 # dataset settings
-dataset_type = "ScanNet200DatasetV2"
+dataset_type = "ScanNet200Dataset"
 data_root = "data/scannet"
 
 data = dict(
@@ -156,7 +130,6 @@ data = dict(
                 segment_ignore_index=segment_ignore_index,
                 instance_ignore_index=-1,
             ),
-            dict(type="Add", keys_dict={"condition": "ScanNet200"}),
             dict(type="ToTensor"),
             dict(
                 type="Collect",
@@ -167,7 +140,6 @@ data = dict(
                     "instance",
                     "instance_centroid",
                     "bbox",
-                    "condition",
                 ),
                 feat_keys=("color", "normal"),
             ),
@@ -204,7 +176,6 @@ data = dict(
                 segment_ignore_index=segment_ignore_index,
                 instance_ignore_index=-1,
             ),
-            dict(type="Add", keys_dict={"condition": "ScanNet200"}),
             dict(type="ToTensor"),
             dict(
                 type="Collect",
@@ -218,7 +189,6 @@ data = dict(
                     "origin_instance",
                     "instance_centroid",
                     "bbox",
-                    "condition",
                 ),
                 feat_keys=("color", "normal"),
                 offset_keys_dict=dict(offset="coord",
