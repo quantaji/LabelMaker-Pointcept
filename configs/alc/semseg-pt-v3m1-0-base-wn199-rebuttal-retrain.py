@@ -3,7 +3,7 @@ from pointcept.datasets.preprocessing.alc.preprocess_arkitscenes_labelmaker_cons
 _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
-batch_size = 1  # bs: total bs in all gpus
+batch_size = 12  # bs: total bs in all gpus
 num_worker = 24
 mix_prob = 0.8
 empty_cache = False

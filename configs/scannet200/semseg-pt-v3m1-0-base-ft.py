@@ -6,12 +6,23 @@ _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
 # weight = "exp/alc/arkitscenes_labelmaker_scannet200_pretrain/model/model_best.pth"
-weight = "exp/alc/arkitscenes_labelmaker_wn199_pretrain/model/model_modified_scannet200.pth"
+# weight = "exp/alc/arkitscenes_labelmaker_wn199_pretrain/model/model_modified_scannet200.pth"
+# weight = "/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/alc/alc_10p_pretrain/model/model_mod_scannet200.pth"
+# weight = "/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/alc/alc_20p_pretrain/model/model_mod_scannet200.pth"
+# weight = "/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/alc/alc_50p_pretrain/model/model_mod_scannet200.pth"
+# weight = "/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/alc/alc_100p_pretrain/model/model_mod_scannet200.pth"
+
+# weight = "/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/scannet200/rebuttal_20p_ft_linear/model/model_last.pth"
+
+# weight = "/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/structured3d/structured3d_100p_pretrain/model/model_structured3d_mod.pth"
+# weight = "/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/scannet200/rebuttal_structured3d_ft_linear/model/model_last.pth"
+
 batch_size = 12  # bs: total bs in all gpus
 num_worker = 24
 mix_prob = 0.8
 empty_cache = False
 enable_amp = True
+find_unused_parameters = True
 
 # model settings
 model = dict(
@@ -55,13 +66,16 @@ model = dict(
         dict(type="CrossEntropyLoss", loss_weight=1.0, ignore_index=-1),
         dict(type="LovaszLoss", mode="multiclass", loss_weight=1.0, ignore_index=-1),
     ],
-    freeze_backbone=True,
-    # freeze_backbone=False,
+    # freeze_backbone=True,
+    freeze_backbone=False,
 )
 
 # scheduler settings
-epoch = 400
-eval_epoch = 400
+# epoch = 400
+# eval_epoch = 400
+
+epoch = 800
+eval_epoch = 800
 # optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
 # scheduler = dict(
 #     type="OneCycleLR",
@@ -93,8 +107,8 @@ data = dict(
     names=CLASS_LABELS_200,
     train=dict(
         type=dataset_type,
-        # split="train",
-        split=["train", "val"],
+        split="train",
+        # split=["train", "val"],
         data_root=data_root,
         transform=[
             dict(type="CenterShift", apply_z=True),

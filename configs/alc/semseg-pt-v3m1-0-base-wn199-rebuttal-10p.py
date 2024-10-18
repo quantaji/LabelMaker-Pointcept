@@ -1,39 +1,31 @@
-from pointcept.datasets.preprocessing.scannet.meta_data.scannet200_constants import (
-    CLASS_LABELS_200,
-)
+from pointcept.datasets.preprocessing.alc.preprocess_arkitscenes_labelmaker_consensus import WORDNET_NAMES
 
 _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
-# weight = "exp/scannet200/ppt_pretrain_scannet200_finetune_linear/model/model_best.pth"
-weight = "/cluster/project/cvg/labelmaker/LabelMaker-Pointcept/exp/alc/alc_20p_pretrain/model/model_mod_scannet200.pth"
 batch_size = 12  # bs: total bs in all gpus
 num_worker = 24
 mix_prob = 0.8
 empty_cache = False
 enable_amp = True
-evaluate = True
-test_only = False
-sync_bn = False
-find_unused_parameters = True
 
 # model settings
 model = dict(
     type="DefaultSegmentorV2",
-    num_classes=200,
+    num_classes=185,
     backbone_out_channels=64,
     backbone=dict(
         type="PT-v3m1",
         in_channels=6,
-        order=("z", "z-trans", "hilbert", "hilbert-trans"),
+        order=["z", "z-trans", "hilbert", "hilbert-trans"],
         stride=(2, 2, 2, 2),
-        enc_depths=(3, 3, 3, 6, 3),
-        enc_channels=(48, 96, 192, 384, 512),
-        enc_num_head=(3, 6, 12, 24, 32),
+        enc_depths=(2, 2, 2, 6, 2),
+        enc_channels=(32, 64, 128, 256, 512),
+        enc_num_head=(2, 4, 8, 16, 32),
         enc_patch_size=(1024, 1024, 1024, 1024, 1024),
-        dec_depths=(3, 3, 3, 3),
-        dec_channels=(64, 96, 192, 384),
-        dec_num_head=(4, 6, 12, 24),
+        dec_depths=(2, 2, 2, 2),
+        dec_channels=(64, 64, 128, 256),
+        dec_num_head=(4, 4, 8, 16),
         dec_patch_size=(1024, 1024, 1024, 1024),
         mlp_ratio=4,
         qkv_bias=True,
@@ -48,58 +40,43 @@ model = dict(
         upcast_attention=False,
         upcast_softmax=False,
         cls_mode=False,
-        pdnorm_bn=True,
-        pdnorm_ln=True,
+        pdnorm_bn=False,
+        pdnorm_ln=False,
         pdnorm_decouple=True,
         pdnorm_adaptive=False,
         pdnorm_affine=True,
-        pdnorm_conditions=("ScanNet", "S3DIS", "Structured3D", "ALC", "ScanNet200"),
+        pdnorm_conditions=("ScanNet", "S3DIS", "Structured3D"),
     ),
     criteria=[
         dict(type="CrossEntropyLoss", loss_weight=1.0, ignore_index=-1),
         dict(type="LovaszLoss", mode="multiclass", loss_weight=1.0, ignore_index=-1),
     ],
-    freeze_backbone=True,
-    # freeze_backbone=False,
 )
 
 # scheduler settings
-epoch = 100
-eval_epoch = 100
-# epoch = 800
-# eval_epoch = 800
-optimizer = dict(type="AdamW", lr=0.0006, weight_decay=0.05)
+epoch = 800
+optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
 scheduler = dict(
     type="OneCycleLR",
-    max_lr=[0.0006, 0.00006],
+    max_lr=[0.006, 0.0006],
     pct_start=0.05,
     anneal_strategy="cos",
     div_factor=10.0,
     final_div_factor=1000.0,
 )
-param_dicts = [dict(keyword="block", lr=0.00006)]
-# optimizer = dict(type="AdamW", lr=0.006, weight_decay=0.05)
-# scheduler = dict(
-#     type="OneCycleLR",
-#     max_lr=[0.006, 0.0006],
-#     pct_start=0.05,
-#     anneal_strategy="cos",
-#     div_factor=10.0,
-#     final_div_factor=1000.0,
-# )
-# param_dicts = [dict(keyword="block", lr=0.0006)]
+param_dicts = [dict(keyword="block", lr=0.0006)]
 
 # dataset settings
-dataset_type = "ScanNet200Dataset"
-data_root = "data/scannet"
+dataset_type = "ARKitScenesLabelMakerConsensusDataset"
+data_root = "data/alc_10p"
 
 data = dict(
-    num_classes=200,
+    num_classes=185,
     ignore_index=-1,
-    names=CLASS_LABELS_200,
+    names=WORDNET_NAMES,
     train=dict(
         type=dataset_type,
-        split="train",
+        split=["train", "val"],
         data_root=data_root,
         transform=[
             dict(type="CenterShift", apply_z=True),
@@ -129,9 +106,12 @@ data = dict(
             dict(type="CenterShift", apply_z=False),
             dict(type="NormalizeColor"),
             # dict(type="ShufflePoint"),
-            dict(type="Add", keys_dict=dict(condition="ScanNet200")),
             dict(type="ToTensor"),
-            dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
+            dict(
+                type="Collect",
+                keys=("coord", "grid_coord", "segment"),
+                feat_keys=("color", "normal"),
+            ),
         ],
         test_mode=False,
     ),
@@ -150,9 +130,12 @@ data = dict(
             ),
             dict(type="CenterShift", apply_z=False),
             dict(type="NormalizeColor"),
-            dict(type="Add", keys_dict=dict(condition="ScanNet200")),
             dict(type="ToTensor"),
-            dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
+            dict(
+                type="Collect",
+                keys=("coord", "grid_coord", "segment"),
+                feat_keys=("color", "normal"),
+            ),
         ],
         test_mode=False,
     ),
@@ -177,9 +160,12 @@ data = dict(
             crop=None,
             post_transform=[
                 dict(type="CenterShift", apply_z=False),
-                dict(type="Add", keys_dict=dict(condition="ScanNet200")),
                 dict(type="ToTensor"),
-                dict(type="Collect", keys=("coord", "grid_coord", "segment", "condition"), feat_keys=("color", "normal")),
+                dict(
+                    type="Collect",
+                    keys=("coord", "grid_coord", "index"),
+                    feat_keys=("color", "normal"),
+                ),
             ],
             aug_transform=[
                 [

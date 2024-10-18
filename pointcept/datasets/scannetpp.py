@@ -12,11 +12,11 @@ import glob
 from pointcept.utils.cache import shared_dict
 
 from .builder import DATASETS
-from .defaults import DefaultDataset
+from .defaults import DefaultDatasetV2
 
 
 @DATASETS.register_module()
-class ScanNetPPDataset(DefaultDataset):
+class ScanNetPPDataset(DefaultDatasetV2):
     VALID_ASSETS = [
         "coord",
         "color",

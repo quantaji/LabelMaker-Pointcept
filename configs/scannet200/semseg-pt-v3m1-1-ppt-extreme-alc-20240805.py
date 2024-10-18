@@ -3,11 +3,11 @@ from pointcept.datasets.preprocessing.scannet.meta_data.scannet200_constants imp
 _base_ = ["../_base_/default_runtime.py"]
 
 # misc custom setting
-batch_size = 12  # bs: total bs in all gpus
+batch_size = 24  # bs: total bs in all gpus
 num_worker = 36
 mix_prob = 0.8
 empty_cache = False
-enable_amp = False
+enable_amp = True
 find_unused_parameters = True
 
 # trainer
