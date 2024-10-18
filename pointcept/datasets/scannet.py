@@ -5,22 +5,22 @@ Author: Xiaoyang Wu (xiaoyang.wu.cs@gmail.com)
 Please cite our work if the code is helpful to you.
 """
 
-import os
 import glob
+import os
+from collections.abc import Sequence
+from copy import deepcopy
+
 import numpy as np
 import torch
-from copy import deepcopy
 from torch.utils.data import Dataset
-from collections.abc import Sequence
 
-from pointcept.utils.logger import get_root_logger
 from pointcept.utils.cache import shared_dict
+from pointcept.utils.logger import get_root_logger
+
 from .builder import DATASETS
-from .transform import Compose, TRANSFORMS
-from .preprocessing.scannet.meta_data.scannet200_constants import (
-    VALID_CLASS_IDS_20,
-    VALID_CLASS_IDS_200,
-)
+from .defaults import DefaultDatasetV2
+from .preprocessing.scannet.meta_data.scannet200_constants import VALID_CLASS_IDS_20, VALID_CLASS_IDS_200
+from .transform import TRANSFORMS, Compose
 
 
 @DATASETS.register_module()
@@ -51,26 +51,35 @@ class ScanNetDataset(Dataset):
 
         if test_mode:
             self.test_voxelize = TRANSFORMS.build(self.test_cfg.voxelize)
-            self.test_crop = TRANSFORMS.build(self.test_cfg.crop) if self.test_cfg.crop else None
+            self.test_crop = TRANSFORMS.build(
+                self.test_cfg.crop) if self.test_cfg.crop else None
             self.post_transform = Compose(self.test_cfg.post_transform)
-            self.aug_transform = [Compose(aug) for aug in self.test_cfg.aug_transform]
+            self.aug_transform = [
+                Compose(aug) for aug in self.test_cfg.aug_transform
+            ]
 
         if lr_file:
-            self.data_list = [os.path.join(data_root, "train", name + ".pth") for name in np.loadtxt(lr_file, dtype=str)]
+            self.data_list = [
+                os.path.join(data_root, "train", name + ".pth")
+                for name in np.loadtxt(lr_file, dtype=str)
+            ]
         else:
             self.data_list = self.get_data_list()
         self.la = torch.load(la_file) if la_file else None
         self.ignore_index = ignore_index
         logger = get_root_logger()
-        logger.info("Totally {} x {} samples in {} set.".format(len(self.data_list), self.loop, split))
+        logger.info("Totally {} x {} samples in {} set.".format(
+            len(self.data_list), self.loop, split))
 
     def get_data_list(self):
         if isinstance(self.split, str):
-            data_list = glob.glob(os.path.join(self.data_root, self.split, "*.pth"))
+            data_list = glob.glob(
+                os.path.join(self.data_root, self.split, "*.pth"))
         elif isinstance(self.split, Sequence):
             data_list = []
             for split in self.split:
-                data_list += glob.glob(os.path.join(self.data_root, split, "*.pth"))
+                data_list += glob.glob(
+                    os.path.join(self.data_root, split, "*.pth"))
         else:
             raise NotImplementedError
         return data_list
@@ -80,7 +89,8 @@ class ScanNetDataset(Dataset):
         if not self.cache:
             data = torch.load(data_path)
         else:
-            data_name = data_path.replace(os.path.dirname(self.data_root), "").split(".")[0]
+            data_name = data_path.replace(os.path.dirname(self.data_root),
+                                          "").split(".")[0]
             cache_name = "pointcept" + data_name.replace(os.path.sep, "-")
             data = shared_dict(cache_name)
         coord = data["coord"]
@@ -113,7 +123,8 @@ class ScanNetDataset(Dataset):
         return data_dict
 
     def get_data_name(self, idx):
-        return os.path.basename(self.data_list[idx % len(self.data_list)]).split(".")[0]
+        return os.path.basename(
+            self.data_list[idx % len(self.data_list)]).split(".")[0]
 
     def prepare_train_data(self, idx):
         # load data
@@ -142,7 +153,9 @@ class ScanNetDataset(Dataset):
 
         for i in range(len(input_dict_list)):
             input_dict_list[i] = self.post_transform(input_dict_list[i])
-        data_dict = dict(fragment_list=input_dict_list, segment=segment, name=self.get_data_name(idx))
+        data_dict = dict(fragment_list=input_dict_list,
+                         segment=segment,
+                         name=self.get_data_name(idx))
         return data_dict
 
     def __getitem__(self, idx):
@@ -187,3 +200,91 @@ class ScanNet200Dataset(ScanNetDataset):
             data_dict["segment"] = segment
             data_dict["sampled_index"] = sampled_index
         return data_dict
+
+
+@DATASETS.register_module()
+class ScanNetDatasetV2(DefaultDatasetV2):
+    VALID_ASSETS = [
+        "coord",
+        "color",
+        "normal",
+        "segment20",
+        "instance",
+    ]
+    class2id = np.array(VALID_CLASS_IDS_20)
+
+    def __init__(
+        self,
+        lr_file=None,
+        la_file=None,
+        **kwargs,
+    ):
+        self.lr = np.loadtxt(lr_file,
+                             dtype=str) if lr_file is not None else None
+        self.la = torch.load(la_file) if la_file is not None else None
+        super().__init__(**kwargs)
+
+    def get_data_list(self):
+        if self.lr is None:
+            data_list = super().get_data_list()
+        else:
+            data_list = [
+                os.path.join(self.data_root, "train", name) for name in self.lr
+            ]
+        return data_list
+
+    def get_data(self, idx):
+        data_path = self.data_list[idx % len(self.data_list)]
+        name = self.get_data_name(idx)
+        if self.cache:
+            cache_name = f"pointcept-{name}"
+            return shared_dict(cache_name)
+
+        data_dict = {}
+        assets = os.listdir(data_path)
+        for asset in assets:
+            if not asset.endswith(".npy"):
+                continue
+            if asset[:-4] not in self.VALID_ASSETS:
+                continue
+            data_dict[asset[:-4]] = np.load(os.path.join(data_path, asset))
+        data_dict["name"] = name
+        data_dict["coord"] = data_dict["coord"].astype(np.float32)
+        data_dict["color"] = data_dict["color"].astype(np.float32)
+        data_dict["normal"] = data_dict["normal"].astype(np.float32)
+
+        if "segment20" in data_dict.keys():
+            data_dict["segment"] = (data_dict.pop("segment20").reshape(
+                [-1]).astype(np.int32))
+        elif "segment200" in data_dict.keys():
+            data_dict["segment"] = (data_dict.pop("segment200").reshape(
+                [-1]).astype(np.int32))
+        else:
+            data_dict["segment"] = (
+                np.ones(data_dict["coord"].shape[0], dtype=np.int32) * -1)
+
+        if "instance" in data_dict.keys():
+            data_dict["instance"] = (data_dict.pop("instance").reshape(
+                [-1]).astype(np.int32))
+        else:
+            data_dict["instance"] = (
+                np.ones(data_dict["coord"].shape[0], dtype=np.int32) * -1)
+        if self.la:
+            sampled_index = self.la[self.get_data_name(idx)]
+            mask = np.ones_like(data_dict["segment"], dtype=bool)
+            mask[sampled_index] = False
+            data_dict["segment"][mask] = self.ignore_index
+            data_dict["sampled_index"] = sampled_index
+        return data_dict
+
+
+@DATASETS.register_module()
+class ScanNet200DatasetV2(ScanNetDatasetV2):
+    VALID_ASSETS = [
+        "coord",
+        "color",
+        "normal",
+        "segment200",
+        "instance",
+    ]
+    class2id = np.array(VALID_CLASS_IDS_200)

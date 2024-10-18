@@ -24,14 +24,14 @@ class PointPromptTraining(nn.Module):
     """
 
     def __init__(
-        self,
-        backbone=None,
-        criteria=None,
-        backbone_out_channels=96,
-        context_channels=256,
-        conditions=("Structured3D", "ScanNet", "S3DIS"),
-        num_classes=(25, 20, 13),
-        backbone_mode=False,
+            self,
+            backbone=None,
+            criteria=None,
+            backbone_out_channels=96,
+            context_channels=256,
+            conditions=("Structured3D", "ScanNet", "S3DIS"),
+            num_classes=(25, 20, 13),
+            backbone_mode=False,
     ):
         super().__init__()
         assert len(conditions) == len(num_classes)
@@ -41,18 +41,17 @@ class PointPromptTraining(nn.Module):
         self.conditions = conditions
         self.embedding_table = nn.Embedding(len(conditions), context_channels)
         self.backbone_mode = backbone_mode
-        self.seg_heads = nn.ModuleList(
-            [nn.Linear(backbone_out_channels, num_cls) for num_cls in num_classes]
-        )
+        self.seg_heads = nn.ModuleList([
+            nn.Linear(backbone_out_channels, num_cls)
+            for num_cls in num_classes
+        ])
 
     def forward(self, data_dict):
         condition = data_dict["condition"][0]
         assert condition in self.conditions
         context = self.embedding_table(
-            torch.tensor(
-                [self.conditions.index(condition)], device=data_dict["coord"].device
-            )
-        )
+            torch.tensor([self.conditions.index(condition)],
+                         device=data_dict["coord"].device))
         data_dict["context"] = context
         point = self.backbone(data_dict)
         # Backbone added after v1.5.0 return Point instead of feat and use DefaultSegmentorV2
@@ -63,7 +62,7 @@ class PointPromptTraining(nn.Module):
             feat = point
         if self.backbone_mode:
             # PPT serve as a multi-dataset backbone when enable backbone mode
-            return feat
+            return point
         seg_head = self.seg_heads[self.conditions.index(condition)]
         seg_logits = seg_head(feat)
         # train
