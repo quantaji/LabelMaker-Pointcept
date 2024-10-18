@@ -1,6 +1,6 @@
 #!/usr/bin/bash
 #SBATCH --job-name="labelmaker-pointcept-env-build"
-#SBATCH --output=labelmaker_pointcept_env_build.out
+#SBATCH --output=pointcept_env_build.out
 #SBATCH --time=2:00:00
 #SBATCH --ntasks=1
 #SBATCH -A ls_polle
@@ -11,14 +11,12 @@
 set -e
 
 module purge
-# module load eth_proxy
-module load stack/2024-06 gcc/12.2.0 cuda/12.1.1 eth_proxy
+module load eth_proxy
 
 export PATH="/cluster/project/cvg/labelmaker/miniconda3/bin:${PATH}"
 export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=true
 
-SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
-REPO_DIR=$SCRIPT_DIR/..
+REPO_DIR=/cluster/project/cvg/labelmaker/LabelMaker-Pointcept
 
 env_name=labelmaker-pointcept
 conda create --name $env_name --yes python=3.9
