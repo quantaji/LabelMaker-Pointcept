@@ -11,9 +11,14 @@
 set -e
 
 module purge
-module load eth_proxy
+# module load eth_proxy
+module load stack/2024-06 gcc/12.2.0 cuda/12.1.1 eth_proxy
 
 export PATH="/cluster/project/cvg/labelmaker/miniconda3/bin:${PATH}"
+export CRYPTOGRAPHY_OPENSSL_NO_LEGACY=true
+
+SCRIPT_DIR=$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)
+REPO_DIR=$SCRIPT_DIR/..
 
 env_name=labelmaker-pointcept
 conda create --name $env_name --yes python=3.9
@@ -36,7 +41,7 @@ pip install sharedarray tensorboard tensorboardx yapf addict einops scipy plyfil
 
 pip install torch-scatter==2.1.2 torch-sparse==0.6.18 torch-cluster==1.6.2 --index-url "" -f "https://data.pyg.org/whl/torch-${INSTALLED_PYTORCH_VERSION}%2B${INSTALLED_CUDA_ABBREV}.html"
 
-cd libs/pointops
+cd ${REPO_DIR}/libs/pointops
 
 conda_home="$(conda info | grep "active env location : " | cut -d ":" -f2-)"
 conda_home="${conda_home#"${conda_home%%[![:space:]]*}"}"
@@ -57,7 +62,6 @@ export MAX_JOBS=12
 export TORCH_CUDA_ARCH_LIST="6.0 6.1 6.2 7.0 7.2 7.5 8.0 8.6"
 
 python setup.py install
-cd ../..
 
 pip install spconv-cu118
 
@@ -71,3 +75,8 @@ pip install -U "git+https://github.com/cvg/LabelMaker.git"
 pip install yapf==0.40.1
 
 pip install git+https://github.com/openai/CLIP.git
+
+# install point group for instance segmentation
+conda install -y -c bioconda google-sparsehash
+cd ${REPO_DIR}/libs/pointgroup_ops
+python setup.py install --include_dirs=${CONDA_PREFIX}/include
