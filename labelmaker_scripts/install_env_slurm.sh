@@ -35,7 +35,7 @@ conda install -y -c "nvidia/label/cuda-${INSTALLED_CUDA_VERSION}" cuda
 
 pip install torch==${INSTALLED_PYTORCH_VERSION} torchvision==${INSTALLED_TORCHVISION_VERSION} torchaudio==${INSTALLED_TORCHAUDIO_VERSION} --index-url https://download.pytorch.org/whl/${INSTALLED_CUDA_ABBREV}
 
-pip install sharedarray tensorboard tensorboardx yapf addict einops scipy plyfile termcolor timm torch-geometric spconv-cu113 h5py pyyaml numpy trimesh pandas
+pip install sharedarray tensorboard tensorboardx yapf addict einops scipy plyfile termcolor timm torch-geometric spconv-cu113 h5py pyyaml numpy trimesh pandas scikit-learn
 
 pip install torch-scatter==2.1.2 torch-sparse==0.6.18 torch-cluster==1.6.2 --index-url "" -f "https://data.pyg.org/whl/torch-${INSTALLED_PYTORCH_VERSION}%2B${INSTALLED_CUDA_ABBREV}.html"
 
