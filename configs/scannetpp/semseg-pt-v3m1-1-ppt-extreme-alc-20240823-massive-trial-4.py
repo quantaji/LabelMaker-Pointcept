@@ -197,7 +197,7 @@ data = dict(
             # dict(
             #     type="ScanNetDataset",
             #     split=["train", "val"],
-            #     data_root="data/scannet",
+            #     data_root="/raid/pointcept-data/scannet",
             #     transform=[
             #         dict(type="CenterShift", apply_z=True),
             #         dict(type="RandomDropout", dropout_ratio=0.2, dropout_application_ratio=0.2),
@@ -227,7 +227,7 @@ data = dict(
             dict(
                 type="ScanNetPPDataset",
                 split="train_grid1mm_chunk6x6_stride3x3",
-                data_root="data/scannetpp",
+                data_root="/raid/pointcept-data/scannetpp",
                 transform=[
                     dict(type="CenterShift", apply_z=True),
                     dict(
@@ -284,7 +284,7 @@ data = dict(
             dict(
                 type="Structured3DDataset",
                 split=["train", "test"],
-                data_root="data/structured3d",
+                data_root="/raid/pointcept-data/structured3d",
                 transform=[
                     dict(type="CenterShift", apply_z=True),
                     dict(type="RandomDropout", dropout_ratio=0.2, dropout_application_ratio=0.2),
@@ -314,7 +314,7 @@ data = dict(
             dict(
                 type="ScanNet200Dataset",
                 split=["train", "val"],
-                data_root="data/scannet",
+                data_root="/raid/pointcept-data/scannet",
                 transform=[
                     dict(type="CenterShift", apply_z=True),
                     dict(type="RandomDropout", dropout_ratio=0.2, dropout_application_ratio=0.2),
@@ -344,7 +344,7 @@ data = dict(
             dict(
                 type="ARKitScenesLabelMakerConsensusDataset",
                 split=["train", "val"],
-                data_root="data/alc",
+                data_root="/raid/pointcept-data/alc",
                 transform=[
                     dict(type="CenterShift", apply_z=True),
                     dict(type="RandomDropout", dropout_ratio=0.2, dropout_application_ratio=0.2),
@@ -390,7 +390,7 @@ data = dict(
     val=dict(
         type="ScanNetPPDataset",
         split="val",
-        data_root="data/scannetpp",
+        data_root="/raid/pointcept-data/scannetpp",
         transform=[
             dict(type="CenterShift", apply_z=True),
             dict(
@@ -415,7 +415,7 @@ data = dict(
     test=dict(
         type="ScanNetPPDataset",
         split="test",
-        data_root="data/scannetpp",
+        data_root="/raid/pointcept-data/scannetpp",
         transform=[
             dict(type="CenterShift", apply_z=True),
             dict(type="NormalizeColor"),
