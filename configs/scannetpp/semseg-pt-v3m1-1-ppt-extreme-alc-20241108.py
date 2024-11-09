@@ -205,7 +205,7 @@ data = dict(
                 type="Structured3DDatasetV2",
                 split=["train", "val", "test"],
                 # data_root="data/structured3d",
-                data_root="/raid/pointcept-data/structured3d",
+                data_root="/raid/LabelMaker-Pointcept/data/structured3d",
                 transform=[
                     dict(type="CenterShift", apply_z=True),
                     dict(
@@ -269,10 +269,10 @@ data = dict(
             ),
             # ScanNet200
             dict(
-                type="ScanNet200Dataset",
+                type="ScanNet200DatasetV2",
                 split=["train", "val"],
                 # data_root="data/scannet",
-                data_root="/raid/pointcept-data/scannet",
+                data_root="/raid/LabelMaker-Pointcept/data/scannet",
                 transform=[
                     dict(type="CenterShift", apply_z=True),
                     dict(
@@ -338,7 +338,7 @@ data = dict(
                 type="ScanNetPPDataset",
                 split="train_grid1mm_chunk6x6_stride3x3",
                 # data_root="data/scannetpp",
-                data_root="/raid/pointcept-data/scannetpp",
+                data_root="/raid/LabelMaker-Pointcept/data/scannetpp",
                 transform=[
                     dict(type="CenterShift", apply_z=True),
                     dict(
@@ -403,7 +403,7 @@ data = dict(
                 type="ARKitScenesLabelMakerConsensusDataset",
                 split=["train", "val"],
                 # data_root="data/alc",
-                data_root="/raid/pointcept-data/alc",
+                data_root="/raid/LabelMaker-Pointcept/data/alc",
                 transform=[
                     dict(type="CenterShift", apply_z=True),
                     dict(type="RandomDropout",
@@ -464,7 +464,7 @@ data = dict(
         type="ScanNetPPDataset",
         split="val",
         # data_root="data/scannetpp",
-        data_root="/raid/pointcept-data/scannetpp",
+        data_root="/raid/LabelMaker-Pointcept/data/scannetpp",
         transform=[
             dict(type="CenterShift", apply_z=True),
             dict(
@@ -490,7 +490,7 @@ data = dict(
         type="ScanNetPPDataset",
         split="val",
         # data_root="data/scannetpp",
-        data_root="/raid/pointcept-data/scannetpp",
+        data_root="/raid/LabelMaker-Pointcept/data/scannetpp",
         transform=[
             dict(type="CenterShift", apply_z=True),
             dict(type="NormalizeColor"),
