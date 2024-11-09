@@ -13,7 +13,7 @@ export CUDA_HOME=$CUDA_PATH
 
 which python
 
-cd /home/guangda/repos/LabelMaker-Pointcept
+cd /home/blum/LabelMaker-Pointcept
 
 # export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5,6,7"
 # export CUDA_VISIBLE_DEVICES="0,1,2,3,4,5"
@@ -22,7 +22,7 @@ export CUDA_VISIBLE_DEVICES="0,1,2,3"
 # export CUDA_VISIBLE_DEVICES="0,1"
 # export CUDA_VISIBLE_DEVICES="0"
 
-INTERPRETER_PATH=/home/guangda/miniconda3/envs/labelmaker-pointcept/bin/python
+INTERPRETER_PATH=/home/blum/miniconda3/envs/labelmaker-pointcept/bin/python
 
 # NUM_GPU=8
 # NUM_GPU=6
