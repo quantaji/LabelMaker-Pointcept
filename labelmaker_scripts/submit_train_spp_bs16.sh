@@ -3,8 +3,8 @@
 #SBATCH --output=ptv3_train_%j.out
 #SBATCH --time=120:00:00
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=32
-#SBATCH --mem-per-cpu=12G
+#SBATCH --cpus-per-task=64
+#SBATCH --mem-per-cpu=7G
 #SBATCH -A ls_polle
 #SBATCH --gpus=rtx_3090:8
 
@@ -48,18 +48,20 @@ NUM_GPU=8
 # NUM_GPU=3
 # NUM_GPU=2
 
-DATASET_NAME=scannet200
-# DATASET_NAME=scannetpp
+# DATASET_NAME=scannet200
+DATASET_NAME=scannetpp
 # DATASET_NAME=scannet
 # DATASET_NAME=alc
 # DATASET_NAME=structured3d
 
-CONFIG_NAME="semseg-pt-v3m1-1-ppt-extreme-alc-20240823-massive-no-alc"
+# CONFIG_NAME="semseg-pt-v3m1-1-ppt-extreme-alc-20241108-submit-bs16"
+# EXP_NAME=20241108_ppt_submit_bs16
 
-EXP_NAME="ablation_no_alc_3090"
+CONFIG_NAME="semseg-pt-v3m1-1-ppt-extreme-alc-20241108-euler-bs16"
+EXP_NAME=20241108_ppt_no_val_bs16
 
-# RESUME=false
-RESUME=true
+RESUME=false
+# RESUME=true
 
 sh scripts/train.sh \
     -p ${INTERPRETER_PATH} \
