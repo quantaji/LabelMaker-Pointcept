@@ -26,6 +26,8 @@ export CUDA_HOST_COMPILER="$conda_home/bin/gcc"
 export CUDA_PATH="$conda_home"
 export CUDA_HOME=$CUDA_PATH
 
+export PYTHONWARNINGS="ignore"
+
 which python
 
 cd /cluster/project/cvg/labelmaker/LabelMaker-Pointcept
