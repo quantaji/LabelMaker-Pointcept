@@ -14,18 +14,14 @@ sync_bn = False
 enable_amp = True
 empty_cache = False
 find_unused_parameters = True
-mix_prob = 0.8
-param_dicts = [dict(keyword='block', lr=0.0005)]
-hooks = [
-    dict(type='CheckpointLoader'),
-    dict(type='IterationTimer', warmup_iter=2),
-    dict(type='InformationWriter'),
-    dict(type='SemSegEvaluator'),
-    dict(type='CheckpointSaver', save_freq=None),
-    dict(type='PreciseEvaluator', test_last=False)
-]
-train = dict(type='MultiDatasetTrainer')
-test = dict(type='SemSegTester', verbose=True)
+clip_grad = 3.0
+
+# trainer
+train = dict(
+    type="MultiDatasetTrainer",
+)
+
+# model settings
 model = dict(
     type='PPT-v1m1',
     backbone=dict(
