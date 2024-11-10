@@ -5,7 +5,9 @@ Author: Xiaoyang Wu (xiaoyang.wu.cs@gmail.com), Chengyao Wang
 Please cite our work if the code is helpful to you.
 """
 
+from contextlib import nullcontext
 from functools import partial
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
@@ -15,13 +17,14 @@ try:
 except ImportError:
     ballquery_batch_p, bfs_cluster = None, None
 
-from pointcept.models.utils import offset2batch, batch2offset
-
 from pointcept.models.builder import MODELS, build_model
+from pointcept.models.utils import batch2offset, offset2batch
+from pointcept.models.utils.structure import Point
 
 
 @MODELS.register_module("PG-v1m1")
 class PointGroup(nn.Module):
+
     def __init__(
         self,
         backbone,
@@ -35,6 +38,7 @@ class PointGroup(nn.Module):
         cluster_propose_points=100,
         cluster_min_points=50,
         voxel_size=0.02,
+        freeze_backbone=False,
     ):
         super().__init__()
         norm_fn = partial(nn.BatchNorm1d, eps=1e-3, momentum=0.01)
@@ -55,16 +59,31 @@ class PointGroup(nn.Module):
             nn.Linear(backbone_out_channels, 3),
         )
         self.seg_head = nn.Linear(backbone_out_channels, semantic_num_classes)
-        self.ce_criteria = torch.nn.CrossEntropyLoss(ignore_index=semantic_ignore_index)
+        self.ce_criteria = torch.nn.CrossEntropyLoss(
+            ignore_index=semantic_ignore_index)
+
+        if freeze_backbone:
+            self.optional_freeze = torch.no_grad
+        else:
+            self.optional_freeze = nullcontext
 
     def forward(self, data_dict):
+
         coord = data_dict["coord"]
         segment = data_dict["segment"]
         instance = data_dict["instance"]
         instance_centroid = data_dict["instance_centroid"]
         offset = data_dict["offset"]
 
-        feat = self.backbone(data_dict)
+        point = Point(data_dict)
+
+        with self.optional_freeze():
+            point = self.backbone(point)
+        if isinstance(point, Point):
+            feat = point.feat
+        else:
+            feat = point
+
         bias_pred = self.bias_head(feat)
         logit_pred = self.seg_head(feat)
 
@@ -77,13 +96,12 @@ class PointGroup(nn.Module):
         bias_l1_loss = torch.sum(bias_dist * mask) / (torch.sum(mask) + 1e-8)
 
         bias_pred_norm = bias_pred / (
-            torch.norm(bias_pred, p=2, dim=1, keepdim=True) + 1e-8
-        )
-        bias_gt_norm = bias_gt / (torch.norm(bias_gt, p=2, dim=1, keepdim=True) + 1e-8)
+            torch.norm(bias_pred, p=2, dim=1, keepdim=True) + 1e-8)
+        bias_gt_norm = bias_gt / (
+            torch.norm(bias_gt, p=2, dim=1, keepdim=True) + 1e-8)
         cosine_similarity = -(bias_pred_norm * bias_gt_norm).sum(-1)
-        bias_cosine_loss = torch.sum(cosine_similarity * mask) / (
-            torch.sum(mask) + 1e-8
-        )
+        bias_cosine_loss = torch.sum(
+            cosine_similarity * mask) / (torch.sum(mask) + 1e-8)
 
         loss = seg_loss + bias_l1_loss + bias_cosine_loss
         return_dict = dict(
@@ -99,17 +117,11 @@ class PointGroup(nn.Module):
             logit_pred = F.softmax(logit_pred, dim=-1)
             segment_pred = torch.max(logit_pred, 1)[1]  # [n]
             # cluster
-            mask = (
-                ~torch.concat(
-                    [
-                        (segment_pred == index).unsqueeze(-1)
-                        for index in self.segment_ignore_index
-                    ],
-                    dim=1,
-                )
-                .sum(-1)
-                .bool()
-            )
+            mask = (~torch.concat(
+                [(segment_pred == index).unsqueeze(-1)
+                 for index in self.segment_ignore_index],
+                dim=1,
+            ).sum(-1).bool())
 
             if mask.sum() == 0:
                 proposals_idx = torch.zeros(0).int()
@@ -134,17 +146,16 @@ class PointGroup(nn.Module):
                     self.cluster_min_points,
                 )
                 proposals_idx[:, 1] = (
-                    mask.nonzero().view(-1)[proposals_idx[:, 1].long()].int()
-                )
+                    mask.nonzero().view(-1)[proposals_idx[:, 1].long()].int())
 
             # get proposal
             proposals_pred = torch.zeros(
-                (proposals_offset.shape[0] - 1, center_pred.shape[0]), dtype=torch.int
-            )
-            proposals_pred[proposals_idx[:, 0].long(), proposals_idx[:, 1].long()] = 1
-            instance_pred = segment_pred[
-                proposals_idx[:, 1][proposals_offset[:-1].long()].long()
-            ]
+                (proposals_offset.shape[0] - 1, center_pred.shape[0]),
+                dtype=torch.int)
+            proposals_pred[proposals_idx[:, 0].long(),
+                           proposals_idx[:, 1].long()] = 1
+            instance_pred = segment_pred[proposals_idx[:, 1][
+                proposals_offset[:-1].long()].long()]
             proposals_point_num = proposals_pred.sum(1)
             proposals_mask = proposals_point_num > self.cluster_propose_points
             proposals_pred = proposals_pred[proposals_mask]
@@ -155,9 +166,8 @@ class PointGroup(nn.Module):
             pred_masks = proposals_pred.detach().cpu()
             for proposal_id in range(len(proposals_pred)):
                 segment_ = proposals_pred[proposal_id]
-                confidence_ = logit_pred[
-                    segment_.bool(), instance_pred[proposal_id]
-                ].mean()
+                confidence_ = logit_pred[segment_.bool(),
+                                         instance_pred[proposal_id]].mean()
                 object_ = instance_pred[proposal_id]
                 pred_scores.append(confidence_)
                 pred_classes.append(object_)

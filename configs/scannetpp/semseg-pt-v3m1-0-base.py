@@ -4,8 +4,8 @@ _base_ = [
 ]
 
 # misc custom setting
-batch_size = 12  # bs: total bs in all gpus
-num_worker = 24
+batch_size = 4  # bs: total bs in all gpus
+num_worker = 8
 mix_prob = 0.8
 empty_cache = False
 enable_amp = True
@@ -52,6 +52,8 @@ model = dict(
         dict(type="CrossEntropyLoss", loss_weight=1.0, ignore_index=-1),
         dict(type="LovaszLoss", mode="multiclass", loss_weight=1.0, ignore_index=-1),
     ],
+    freeze_backbone=True,
+    # freeze_backbone=False,
 )
 
 # scheduler settings

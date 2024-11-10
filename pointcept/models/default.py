@@ -1,8 +1,12 @@
+from contextlib import nullcontext
+
+import torch
 import torch.nn as nn
 import torch_scatter
 
 from pointcept.models.losses import build_criteria
 from pointcept.models.utils.structure import Point
+
 from .builder import MODELS, build_model
 
 
@@ -40,19 +44,22 @@ class DefaultSegmentorV2(nn.Module):
         backbone_out_channels,
         backbone=None,
         criteria=None,
+        freeze_backbone=False,
     ):
         super().__init__()
-        self.seg_head = (
-            nn.Linear(backbone_out_channels, num_classes)
-            if num_classes > 0
-            else nn.Identity()
-        )
+        self.seg_head = nn.Linear(backbone_out_channels, num_classes) if num_classes > 0 else nn.Identity()
         self.backbone = build_model(backbone)
         self.criteria = build_criteria(criteria)
 
+        if freeze_backbone:
+            self.optional_freeze = torch.no_grad
+        else:
+            self.optional_freeze = nullcontext
+
     def forward(self, input_dict):
         point = Point(input_dict)
-        point = self.backbone(point)
+        with self.optional_freeze():
+            point = self.backbone(point)
         # Backbone added after v1.5.0 return Point instead of feat and use DefaultSegmentorV2
         # TODO: remove this part after make all backbone return Point only.
         if isinstance(point, Point):

@@ -77,11 +77,7 @@ class TesterBase:
                         key = "module." + key  # xxx.xxx -> module.xxx.xxx
                 weight[key] = value
             model.load_state_dict(weight, strict=True)
-            self.logger.info(
-                "=> Loaded weight '{}' (epoch {})".format(
-                    self.cfg.weight, checkpoint["epoch"]
-                )
-            )
+            self.logger.info("=> Loaded weight '{}' (epoch {})".format(self.cfg.weight, checkpoint["epoch"]))
         else:
             raise RuntimeError("=> No checkpoint found at '{}'".format(self.cfg.weight))
         return model
@@ -113,6 +109,7 @@ class TesterBase:
 
 @TESTERS.register_module()
 class SemSegTester(TesterBase):
+
     def test(self):
         assert self.test_loader.batch_size == 1
         logger = get_root_logger()
@@ -133,9 +130,7 @@ class SemSegTester(TesterBase):
             or self.cfg.data.test.type == "ScanNetPPDataset"
         ) and comm.is_main_process():
             make_dirs(os.path.join(save_path, "submit"))
-        elif (
-            self.cfg.data.test.type == "SemanticKITTIDataset" and comm.is_main_process()
-        ):
+        elif self.cfg.data.test.type == "SemanticKITTIDataset" and comm.is_main_process():
             make_dirs(os.path.join(save_path, "submit"))
         elif self.cfg.data.test.type == "NuScenesDataset" and comm.is_main_process():
             import json
@@ -151,9 +146,7 @@ class SemSegTester(TesterBase):
                     use_external=False,
                 )
             )
-            with open(
-                os.path.join(save_path, "submit", "test", "submission.json"), "w"
-            ) as f:
+            with open(os.path.join(save_path, "submit", "test", "submission.json"), "w") as f:
                 json.dump(submission, f, indent=4)
         comm.synchronize()
         record = {}
@@ -166,11 +159,7 @@ class SemSegTester(TesterBase):
             data_name = data_dict.pop("name")
             pred_save_path = os.path.join(save_path, "{}_pred.npy".format(data_name))
             if os.path.isfile(pred_save_path):
-                logger.info(
-                    "{}/{}: {}, loaded pred and label.".format(
-                        idx + 1, len(self.test_loader), data_name
-                    )
-                )
+                logger.info("{}/{}: {}, loaded pred and label.".format(idx + 1, len(self.test_loader), data_name))
                 pred = np.load(pred_save_path)
                 if "origin_segment" in data_dict.keys():
                     segment = data_dict["origin_segment"]
@@ -178,9 +167,7 @@ class SemSegTester(TesterBase):
                 pred = torch.zeros((segment.size, self.cfg.data.num_classes)).cuda()
                 for i in range(len(fragment_list)):
                     fragment_batch_size = 1
-                    s_i, e_i = i * fragment_batch_size, min(
-                        (i + 1) * fragment_batch_size, len(fragment_list)
-                    )
+                    s_i, e_i = i * fragment_batch_size, min((i + 1) * fragment_batch_size, len(fragment_list))
                     input_dict = collate_fn(fragment_list[s_i:e_i])
                     for key in input_dict.keys():
                         if isinstance(input_dict[key], torch.Tensor):
@@ -271,9 +258,7 @@ class SemSegTester(TesterBase):
             intersection_meter.update(intersection)
             union_meter.update(union)
             target_meter.update(target)
-            record[data_name] = dict(
-                intersection=intersection, union=union, target=target
-            )
+            record[data_name] = dict(intersection=intersection, union=union, target=target)
 
             mask = union != 0
             iou_class = intersection / (union + 1e-10)
@@ -311,9 +296,7 @@ class SemSegTester(TesterBase):
                 r = record_sync.pop()
                 record.update(r)
                 del r
-            intersection = np.sum(
-                [meters["intersection"] for _, meters in record.items()], axis=0
-            )
+            intersection = np.sum([meters["intersection"] for _, meters in record.items()], axis=0)
             union = np.sum([meters["union"] for _, meters in record.items()], axis=0)
             target = np.sum([meters["target"] for _, meters in record.items()], axis=0)
 
@@ -329,11 +312,7 @@ class SemSegTester(TesterBase):
             mAcc = np.mean(accuracy_class)
             allAcc = sum(intersection) / (sum(target) + 1e-10)
 
-            logger.info(
-                "Val result: mIoU/mAcc/allAcc {:.4f}/{:.4f}/{:.4f}".format(
-                    mIoU, mAcc, allAcc
-                )
-            )
+            logger.info("Val result: mIoU/mAcc/allAcc {:.4f}/{:.4f}/{:.4f}".format(mIoU, mAcc, allAcc))
             for i in range(self.cfg.data.num_classes):
                 logger.info(
                     "Class_{idx} - {name} Result: iou/accuracy {iou:.4f}/{accuracy:.4f}".format(
@@ -371,21 +350,15 @@ class ClsTester(TesterBase):
             output = output_dict["cls_logits"]
             pred = output.max(1)[1]
             label = input_dict["category"]
-            intersection, union, target = intersection_and_union_gpu(
-                pred, label, self.cfg.data.num_classes, self.cfg.data.ignore_index
-            )
+            intersection, union, target = intersection_and_union_gpu(pred, label, self.cfg.data.num_classes, self.cfg.data.ignore_index)
             if comm.get_world_size() > 1:
-                dist.all_reduce(intersection), dist.all_reduce(union), dist.all_reduce(
-                    target
-                )
+                dist.all_reduce(intersection), dist.all_reduce(union), dist.all_reduce(target)
             intersection, union, target = (
                 intersection.cpu().numpy(),
                 union.cpu().numpy(),
                 target.cpu().numpy(),
             )
-            intersection_meter.update(intersection), union_meter.update(
-                union
-            ), target_meter.update(target)
+            intersection_meter.update(intersection), union_meter.update(union), target_meter.update(target)
 
             accuracy = sum(intersection_meter.val) / (sum(target_meter.val) + 1e-10)
             batch_time.update(time.time() - end)
@@ -406,11 +379,7 @@ class ClsTester(TesterBase):
         mIoU = np.mean(iou_class)
         mAcc = np.mean(accuracy_class)
         allAcc = sum(intersection_meter.sum) / (sum(target_meter.sum) + 1e-10)
-        logger.info(
-            "Val result: mIoU/mAcc/allAcc {:.4f}/{:.4f}/{:.4f}.".format(
-                mIoU, mAcc, allAcc
-            )
-        )
+        logger.info("Val result: mIoU/mAcc/allAcc {:.4f}/{:.4f}/{:.4f}.".format(mIoU, mAcc, allAcc))
 
         for i in range(self.cfg.data.num_classes):
             logger.info(
@@ -558,9 +527,7 @@ class PartSegTester(TesterBase):
         iou_category, iou_count = np.zeros(num_categories), np.zeros(num_categories)
         self.model.eval()
 
-        save_path = os.path.join(
-            self.cfg.save_path, "result", "test_epoch{}".format(self.cfg.test_epoch)
-        )
+        save_path = os.path.join(self.cfg.save_path, "result", "test_epoch{}".format(self.cfg.test_epoch))
         make_dirs(save_path)
 
         for idx in range(len(test_dataset)):
@@ -571,9 +538,7 @@ class PartSegTester(TesterBase):
             pred = torch.zeros((label.size, self.cfg.data.num_classes)).cuda()
             batch_num = int(np.ceil(len(data_dict_list) / self.cfg.batch_size_test))
             for i in range(batch_num):
-                s_i, e_i = i * self.cfg.batch_size_test, min(
-                    (i + 1) * self.cfg.batch_size_test, len(data_dict_list)
-                )
+                s_i, e_i = i * self.cfg.batch_size_test, min((i + 1) * self.cfg.batch_size_test, len(data_dict_list))
                 input_dict = collate_fn(data_dict_list[s_i:e_i])
                 for key in input_dict.keys():
                     if isinstance(input_dict[key], torch.Tensor):
@@ -611,19 +576,11 @@ class PartSegTester(TesterBase):
             iou_count[category_index] += 1
 
             batch_time.update(time.time() - end)
-            logger.info(
-                "Test: {} [{}/{}] "
-                "Batch {batch_time.val:.3f} "
-                "({batch_time.avg:.3f}) ".format(
-                    data_name, idx + 1, len(self.test_loader), batch_time=batch_time
-                )
-            )
+            logger.info("Test: {} [{}/{}] " "Batch {batch_time.val:.3f} " "({batch_time.avg:.3f}) ".format(data_name, idx + 1, len(self.test_loader), batch_time=batch_time))
 
         ins_mIoU = iou_category.sum() / (iou_count.sum() + 1e-10)
         cat_mIoU = (iou_category / (iou_count + 1e-10)).mean()
-        logger.info(
-            "Val result: ins.mIoU/cat.mIoU {:.4f}/{:.4f}.".format(ins_mIoU, cat_mIoU)
-        )
+        logger.info("Val result: ins.mIoU/cat.mIoU {:.4f}/{:.4f}.".format(ins_mIoU, cat_mIoU))
         for i in range(num_categories):
             logger.info(
                 "Class_{idx}-{name} Result: iou_cat/num_sample {iou_cat:.4f}/{iou_count:.4f}".format(
